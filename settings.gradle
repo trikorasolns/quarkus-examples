@@ -8,4 +8,6 @@ pluginManagement {
         id "${quarkusPluginId}" version "${quarkusPluginVersion}"
     }
 }
-rootProject.name='quarkus-hibernate-reactive-panache'
+rootProject.name='quarkus-examples'
+
+include 'hibernate-reactive-panache'
