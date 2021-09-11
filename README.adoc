@@ -1,29 +1,12 @@
-= quarkus-hibernate-reactive-panache Project
+= Quarkus Examples
 :toc:left
 :icons: font
 :source-highlighter: rouge
-:description: Example project for using Hibernate Reactive Panache in Quarkus.
+:description: This project includes several samples for Quarkus core functionality.
 
-== Requirements
+== Modules
 
-=== Mariadb database
-
-This project requires a mariadb database to run. This database can be provided by a container.
-The following instructions will provide a mariadb container with [Podman](https://podman.io/).
-
-Create the database POD.
-
-NOTE: The database port mapping must be the one informe in the link:src/main/resources/application.properties[application.properties] file.
-
-[source,shell script]
-----
-podman pod create -p 7736:3306 --name quarkus_example_db_pod
-----
-
-[source,shell script]
-----
-podman run --rm --name quarkus_example_db -e MYSQL_ROOT_PASSWORD=quarkus_example -e MYSQL_DATABASE=quarkus_example -e MYSQL_USER=quarkus_example -e MYSQL_PASSWORD=quarkus_example --pod quarkus_example_db_pod mariadb:latest
-----
+include::hibernate-reactive-panache/README.adoc[leveloffset=+1]
 
 == Quarkus Intro
 
