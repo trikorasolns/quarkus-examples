@@ -8,6 +8,15 @@
 
 include::hibernate-reactive-panache/README.adoc[leveloffset=+1]
 
+== Building all subprojects
+
+Build all subprojects by calling the `quarkusBuildSubprojects` task.
+
+[source,shell script]
+----
+./gradlew quarkusBuildSubprojects
+----
+
 == Quarkus Intro
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
