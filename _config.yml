@@ -1,1 +1,27 @@
-theme: jekyll-theme-minimal
+lsi: false
+safe: true
+source: [your repo's top level directory]
+incremental: false
+highlighter: rouge
+gist:
+  noscript: false
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
+
+
+future: true
+theme: jekyll-theme-hacker
+plugins:
+  - jekyll-feed
+  - jekyll-gist
+  - jekyll-octicons
+  - jekyll-toc
+  - jekyll-twitter-plugin
+  - jekyll-relative-links
+  - jekyll-seo-tag
+  - jekyll-remote-theme
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jemoji
+  - jekyll-asciidoc

@@ -1,38 +1,38 @@
 plugins {
-    id 'java'
-    id 'io.quarkus'
-}
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
-dependencies {
-    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
-    implementation 'io.quarkus:quarkus-hibernate-reactive'
-    implementation 'io.quarkus:quarkus-hibernate-reactive-panache'
-    implementation 'io.quarkus:quarkus-hibernate-validator'
-    implementation 'io.quarkus:quarkus-reactive-mysql-client'
-    implementation 'io.quarkus:quarkus-arc'
-    implementation 'io.quarkus:quarkus-resteasy'
-    testImplementation 'io.quarkus:quarkus-junit5'
-    testImplementation 'io.rest-assured:rest-assured'
+  id 'java'
+  id 'io.quarkus'
 }
 
 group 'com.trikorasolutions.example'
 version '1.0.0-SNAPSHOT'
 
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+tasks.register('quarkusBuildSubprojects') {
+  rootProject.subprojects.forEach() {
+    dependsOn("${it.getName()}:quarkusBuild")
+  }
+}
+
+tasks.register('quarkusTestSubprojects') {
+  rootProject.subprojects.forEach() {
+    dependsOn("${it.getName()}:quarkusTest")
+  }
+}
+
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
 
 compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << '-parameters'
+  options.encoding = 'UTF-8'
+  options.compilerArgs << '-parameters'
 }
 
 compileTestJava {
-    options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
 }

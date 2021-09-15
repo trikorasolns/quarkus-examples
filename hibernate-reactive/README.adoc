@@ -1,6 +1,6 @@
 = hibernate-reactive-panache Project
 
-:toc:left
+:toc: left
 :icons: font
 :source-highlighter: rouge
 :description: Example project for using Hibernate Reactive Panache in Quarkus.
