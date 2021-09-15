@@ -67,17 +67,17 @@ public class FruitReactiveResource {
     });
   }
 
-  @PUT
-  @Path("/ripe/{family}")
-  public Uni<Response> ripe(final @RestPath String family) {
-    return repoFruit.ripe(family).onItem().transform(delCount -> {
-      LOGGER.info("deleted fruit: {}", delCount);
-      if (delCount > 0) {
-        return Response.ok(delCount).build();
-      } else {
-        return Response.ok().status(NOT_FOUND).build();
-      }
-    });
-  }
+//  @PUT
+//  @Path("/ripe/{family}")
+//  public Uni<Response> ripe(final @RestPath String family) {
+//    return repoFruit.ripe(family).onItem().transform(delCount -> {
+//      LOGGER.info("deleted fruit: {}", delCount);
+//      if (delCount > 0) {
+//        return Response.ok(delCount).build();
+//      } else {
+//        return Response.ok().status(NOT_FOUND).build();
+//      }
+//    });
+//  }
 
 }
