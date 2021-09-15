@@ -6,6 +6,7 @@ import javax.persistence.*;
 @Table(name = "fruit")
 @NamedQuery(name = "Fruit.listAll", query = "SELECT f FROM Fruit f ORDER BY f.name")
 @NamedQuery(name = "Fruit.delete", query = "DELETE FROM Fruit f WHERE f.name = :name")
+@NamedQuery(name = "Fruit.fetchFamily", query = "SELECT f FROM Fruit f WHERE f.family = :family")
 public class Fruit {
 
   @Id
@@ -15,6 +16,8 @@ public class Fruit {
   @Column(length = 200)
   public String description;
 
+  @Column(length = 50)
+  public String family;
 
   @Column(nullable = false)
   public Boolean isRipen = false;
@@ -31,7 +34,7 @@ public class Fruit {
     this.description = description;
   }
 
-  public Fruit(String name, String description, Boolean isRipen) {
+  public Fruit(String name, String description, String family, Boolean isRipen) {
     this.name = name;
     this.description = description;
     this.isRipen = isRipen;
@@ -54,6 +57,13 @@ public class Fruit {
     this.description = description;
   }
 
+  public String getFamily() {
+    return family;
+  }
+
+  public void setFamily(String family) {
+    this.family = family;
+  }
 
   public Boolean getRipen() {
     return isRipen;

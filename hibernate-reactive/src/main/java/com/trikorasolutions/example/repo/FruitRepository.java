@@ -27,8 +27,22 @@ public class FruitRepository {
   }
 
   public Uni<Integer> delete(final String name) {
+    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.delete").setParameter("name", name).executeUpdate());
+  }
+
+  public Uni<Integer> ripe(final String family) {
     return sf.withTransaction(
-      (s, t) -> s.createNamedQuery("Fruit.delete").setParameter("name", name).executeUpdate());
+      (s, t) -> s.createNamedQuery("Fruit.fetchFamily", Fruit.class).setParameter("family", family).getResultList()
+        .onItem().transform(lstFruits -> {
+//          Integer updateCount = 0;
+          lstFruits.forEach(fruit -> {
+            if (!fruit.isRipen) {
+              fruit.setRipen(true);
+//              updateCount++;
+            }
+          });
+//          return updateCount;
+        }));
   }
 
 }

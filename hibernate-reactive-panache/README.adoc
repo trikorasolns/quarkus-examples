@@ -1,4 +1,5 @@
 = hibernate-reactive-panache Project
+
 :toc:left
 :icons: font
 :source-highlighter: rouge

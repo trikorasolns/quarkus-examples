@@ -1,16 +1,20 @@
 = Quarkus Examples
-:toc:left
+A.C. <info@trikorasolutions.com>
+:toc: left
+:toclevels: 4
 :icons: font
 :source-highlighter: rouge
 :description: This project includes several samples for Quarkus core functionality.
 
 == Modules
 
-include::hibernate-reactive-panache/README.adoc[leveloffset=+1]
+include::hibernate-reactive/README.adoc[leveloffset=+2]
+include::hibernate-reactive-panache/README.adoc[leveloffset=+2]
 
 == Building all subprojects
 
 Build all subprojects by calling the `quarkusBuildSubprojects` task.
+
 
 [source,shell script]
 ----
