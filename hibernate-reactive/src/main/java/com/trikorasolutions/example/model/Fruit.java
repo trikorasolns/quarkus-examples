@@ -20,7 +20,7 @@ public class Fruit {
   public String family;
 
   @Column(nullable = false)
-  public Boolean isRipen = false;
+  public Boolean ripen = false;
 
 //  @SequenceGenerator(name = "fruitSequence", sequenceName = "fruit_id_seq", allocationSize = 1, initialValue = 1)
 //  @GeneratedValue(generator = "fruitSequence")
@@ -37,7 +37,8 @@ public class Fruit {
   public Fruit(String name, String description, String family, Boolean isRipen) {
     this.name = name;
     this.description = description;
-    this.isRipen = isRipen;
+    this.family = family;
+    this.ripen = isRipen;
   }
 
   public String getName() {
@@ -66,10 +67,10 @@ public class Fruit {
   }
 
   public Boolean getRipen() {
-    return isRipen;
+    return ripen;
   }
 
   public void setRipen(Boolean ripen) {
-    isRipen = ripen;
+    ripen = ripen;
   }
 }
