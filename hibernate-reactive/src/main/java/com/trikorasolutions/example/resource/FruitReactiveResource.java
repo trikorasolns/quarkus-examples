@@ -1,5 +1,6 @@
 package com.trikorasolutions.example.resource;
 
+import com.trikorasolutions.example.logic.FruitLogic;
 import com.trikorasolutions.example.model.Fruit;
 import com.trikorasolutions.example.repo.FruitRepository;
 import io.smallrye.mutiny.Uni;
@@ -20,6 +21,9 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 @Consumes("application/json")
 public class FruitReactiveResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(FruitReactiveResource.class);
+
+  @Inject
+  FruitLogic logicFruit;
 
   @Inject
   FruitRepository repoFruit;
@@ -55,7 +59,7 @@ public class FruitReactiveResource {
   }
 
   @DELETE
-  @Path("{name}")
+  @Path("/{name}")
   public Uni<Response> delete(final @RestPath String name) {
     return repoFruit.delete(name).onItem().transform(delCount -> {
       LOGGER.info("deleted fruit: {}", delCount);
@@ -67,17 +71,17 @@ public class FruitReactiveResource {
     });
   }
 
-//  @PUT
-//  @Path("/ripe/{family}")
-//  public Uni<Response> ripe(final @RestPath String family) {
-//    return repoFruit.ripe(family).onItem().transform(delCount -> {
-//      LOGGER.info("deleted fruit: {}", delCount);
+  @PUT
+  @Path("/ripe/{family}")
+  public Uni<Response> ripeFamily(final @RestPath String family) {
+    return logicFruit.ripe(family).onItem().transform(delCount -> {
+      LOGGER.info("ripen fruit: {}", delCount);
 //      if (delCount > 0) {
-//        return Response.ok(delCount).build();
+        return Response.ok(delCount).build();
 //      } else {
 //        return Response.ok().status(NOT_FOUND).build();
 //      }
-//    });
-//  }
+    });
+  }
 
 }

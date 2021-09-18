@@ -9,6 +9,7 @@ A.C. <info@trikorasolutions.com>
 == Modules
 
 include::hibernate-reactive/README.adoc[leveloffset=+2]
+
 include::hibernate-reactive-panache/README.adoc[leveloffset=+2]
 
 == Building all subprojects
