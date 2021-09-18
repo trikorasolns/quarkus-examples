@@ -1,15 +1,15 @@
-lsi: false
-safe: true
-incremental: false
-highlighter: rouge
-gist:
-  noscript: false
-kramdown:
-  math_engine: mathjax
-  syntax_highlighter: rouge
+#lsi: false
+#safe: true
+#incremental: false
+#highlighter: rouge
+#gist:
+#  noscript: false
+#kramdown:
+#  math_engine: mathjax
+#  syntax_highlighter: rouge
 
 
-future: true
+#future: true
 theme: jekyll-theme-hacker
 plugins:
   - jekyll-feed
