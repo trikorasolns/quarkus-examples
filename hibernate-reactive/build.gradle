@@ -21,7 +21,6 @@ dependencies {
   // Database
   implementation 'io.quarkus:quarkus-hibernate-reactive-panache'
   implementation 'io.quarkus:quarkus-hibernate-validator'
-  implementation 'io.quarkus:quarkus-reactive-mysql-client'
   implementation 'io.quarkus:quarkus-arc'
   // Rest
   implementation 'io.quarkus:quarkus-resteasy-reactive'
