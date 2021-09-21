@@ -32,46 +32,56 @@ public class FruitReactiveResourceTest {
   }
 
   @Test
-  public void testGetFruitReactiveUnknown() {
-    given().when().get("/fruitreact/name/unknown").then().statusCode(NOT_FOUND.getStatusCode());
+  public void testCreateReactive() {
+    given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
+
+    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
+
+    given().when().get("/fruitreact/name/pear").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
   }
 
   @Test
-  public void testGetFruitPearReactive() {
+  public void testGetFruitReactive() {
+    given().when().get("/fruitreact/name/unknown").then().statusCode(NOT_FOUND.getStatusCode());
+
     given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
       .post("/fruitreact/create").then().statusCode(200)
-      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""))
-    ;
-
-    given().when().body("{\"name\": \"pear\", \"description\": \"Pear\"}").contentType("application/json")
-      .post("/fruitreact/create").then().statusCode(200)
-      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""))
-    ;
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
 
     given().when().get("/fruitreact/name/pear").then().statusCode(200)
-      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""))
-    ;
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
+  }
+
+  @Test
+  public void testFruitListAllReactive() {
+    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
+
+    given().when().body(new Fruit("apple", "Apple", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
+
+    given().when().get("/fruitreact/listAll").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""),
+        containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
+
+  }
+
+  @Test
+  public void testDeleteFruitReactive() {
+    given().when().delete("/fruitreact/lemon").then().statusCode(NOT_FOUND.getStatusCode());
+
+    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
 
     given().when().delete("/fruitreact/pear").then().statusCode(200).body(containsString("1"));
 
     given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
-  }
-
-//  @Test
-  public void testFruitListReactive() {
-//    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(200)
-//      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
-//
-//    given().when().body(new Fruit("apple", "Apple", "Rosaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(200)
-//      .body(containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
-
-//    given().when().get("/fruitreact/listAll").then().statusCode(200)
-//      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""),
-//        containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
-//
-//    given().when().delete("/fruitreact/lemon").then().statusCode(NOT_FOUND.getStatusCode());
   }
 
 //  @Test
@@ -107,6 +117,4 @@ public class FruitReactiveResourceTest {
 //      .body(containsString("\"name\":\"pineapple\""), containsString("\"ripen\":false"));
 //
 //  }
-
-
 }

@@ -3,6 +3,7 @@ package com.trikorasolutions.example.resource;
 import com.trikorasolutions.example.model.Fruit;
 import com.trikorasolutions.example.repo.FruitRepository;
 import io.smallrye.mutiny.Uni;
+import org.jboss.resteasy.reactive.RestPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +27,27 @@ public class FruitReactiveResource {
   @Inject
   FruitRepository repoFruit;
 
-//  @GET
-//  @Path("/listAll")
-//  public Uni<Response> listAll(final @PathParam("name") String name) {
-//    return repoFruit.listAll().onItem().transform(fruit -> {
-//      return Response.ok(fruit).build();
-//    });
-//  }
+  @POST
+  @Path("/create")
+  public Uni<Response> create(final Fruit fruit) {
+    return repoFruit.create(fruit).onItem().transform(fruit1 -> {
+      LOGGER.info("created fruit: {}", fruit1);
+      return Response.ok(fruit1).build();
+    });
+  }
+
+  @DELETE
+  @Path("/{name}")
+  public Uni<Response> delete(final @RestPath String name) {
+    return repoFruit.delete(name).onItem().transform(delCount -> {
+      LOGGER.info("deleted fruit: {}", delCount);
+      if (delCount > 0) {
+        return Response.ok(delCount).build();
+      } else {
+        return Response.ok().status(NOT_FOUND).build();
+      }
+    });
+  }
 
   @GET
   @Path("/name/{name}")
@@ -47,27 +62,13 @@ public class FruitReactiveResource {
     });
   }
 
-  @POST
-  @Path("/create")
-  public Uni<Response> create(final Fruit fruit) {
-    return repoFruit.create(fruit).onItem().transform(fruit1 -> {
-      LOGGER.info("created fruit: {}", fruit1);
-      return Response.ok(fruit1).build();
+  @GET
+  @Path("/listAll")
+  public Uni<Response> listAll(final @PathParam("name") String name) {
+    return repoFruit.listAll().onItem().transform(fruit -> {
+      return Response.ok(fruit).build();
     });
   }
-
-//  @DELETE
-//  @Path("/{name}")
-//  public Uni<Response> delete(final @RestPath String name) {
-//    return repoFruit.delete(name).onItem().transform(delCount -> {
-//      LOGGER.info("deleted fruit: {}", delCount);
-//      if (delCount > 0) {
-//        return Response.ok(delCount).build();
-//      } else {
-//        return Response.ok().status(NOT_FOUND).build();
-//      }
-//    });
-//  }
 
 //  @PUT
 //  @Path("/ripe/{family}")

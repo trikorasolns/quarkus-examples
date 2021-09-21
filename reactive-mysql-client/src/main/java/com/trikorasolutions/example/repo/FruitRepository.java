@@ -54,7 +54,7 @@ public class FruitRepository {
   /**
    * Delete a fruit from the DB.
    *
-   * @param name Name od the fruit whose register is going to be deleted
+   * @param name Name od the fruit whose register is going to be deleted.
    * @return The number of tuples that have been deleted from the DB.
    */
   public Uni<Integer> delete(final String name) {
@@ -67,39 +67,32 @@ public class FruitRepository {
   }
 
   /**
-   * @return
+   * List all the elements that are available in the fruit table.
+   *
+   * @return A list with all the tuples of the table.
    */
   public Uni<List<Fruit>> listAll() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#listAll(String) ");
+    }
+
     return sqlPool.preparedQuery("SELECT * FROM fruit").execute().onItem()
       .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-
+  /**
+   * Search all the fruits of a concrete family in the DB.
+   *
+   * @param family The kind of fruit that we want to search in the DB.
+   * @return A list with the desired fruits.
+   */
   public Uni<List<Fruit>> findByFamily(String family) {
-    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.fetchFamily", Fruit.class).setParameter("family", family).getResultList());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#findByFamily(String) - {}", family);
+    }
+
+    return sqlPool.preparedQuery("SELECT * FROM fruit where family =?").execute(Tuple.of(family)).onItem()
+      .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
   }
 
-  public Uni<Integer> update(final String name) {
-    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.delete").setParameter("name", name).executeUpdate());
-  }
-
-
-*/
 }
