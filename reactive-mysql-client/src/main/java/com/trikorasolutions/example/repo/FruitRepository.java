@@ -3,7 +3,6 @@ package com.trikorasolutions.example.repo;
 import com.trikorasolutions.example.model.Fruit;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 import org.slf4j.Logger;
@@ -11,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 @ApplicationScoped
 public class FruitRepository {
@@ -65,20 +62,16 @@ public class FruitRepository {
       LOGGER.debug("#delete(String) - {}", name);
     }
 
-    return sqlPool.preparedQuery(
-        " DELETE FROM fruit WHERE name = ?" )
-      .execute(Tuple.of(name)).onItem()
-      .transform(rowSet -> rowSet.rowCount() );
+    return sqlPool.preparedQuery(" DELETE FROM fruit WHERE name = ?").execute(Tuple.of(name)).onItem()
+      .transform(rowSet -> rowSet.rowCount());
   }
 
   /**
-   *
    * @return
    */
   public Uni<List<Fruit>> listAll() {
     return sqlPool.preparedQuery("SELECT * FROM fruit").execute().onItem()
-      .transformToMulti(rows ->Multi.createFrom().iterable(rows))
-      .onItem().transform(Fruit::from).collect().asList();
+      .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
   }
 
 
