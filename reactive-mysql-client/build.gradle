@@ -1,0 +1,53 @@
+plugins {
+  id 'java'
+  id 'io.quarkus'
+}
+
+//gradle.beforeProject {
+//  file("../gradle.properties").withReader {
+//    Properties props = new Properties()
+//    props.load(it)
+//    project.properties.putAll(props)
+//  }
+//}
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+dependencies {
+  implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+  // Database
+  implementation 'io.quarkus:quarkus-hibernate-reactive-panache'
+  implementation 'io.quarkus:quarkus-hibernate-validator'
+  implementation 'io.quarkus:quarkus-reactive-mysql-client'
+  implementation 'io.quarkus:quarkus-arc'
+  // Rest
+  implementation 'io.quarkus:quarkus-resteasy-reactive'
+  implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+  // Console
+  implementation 'io.quarkus:quarkus-smallrye-health'
+  implementation 'io.quarkus:quarkus-smallrye-graphql'
+  implementation 'io.quarkus:quarkus-smallrye-openapi'
+  // Test
+  testImplementation 'io.quarkus:quarkus-junit5'
+  testImplementation 'io.rest-assured:rest-assured'
+}
+
+group 'com.trikorasolutions.example'
+version '1.0.0-SNAPSHOT'
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
+compileJava {
+  options.encoding = 'UTF-8'
+  options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+  options.encoding = 'UTF-8'
+}

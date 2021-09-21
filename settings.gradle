@@ -12,3 +12,4 @@ rootProject.name='quarkus-examples'
 
 include 'hibernate-reactive'
 include 'hibernate-reactive-panache'
+include 'reactive-mysql-client'
