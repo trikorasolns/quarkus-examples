@@ -57,6 +57,21 @@ public class FruitRepository {
    * @param name Name od the fruit whose register is going to be deleted.
    * @return The number of tuples that have been deleted from the DB.
    */
+  public Uni<Fruit> update(final String name, final Fruit fruit) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#delete(String) - {}", name);
+    }
+
+    return sqlPool.preparedQuery(" DELETE FROM fruit WHERE name = ?").execute(Tuple.of(name)).onItem()
+      .transform(rowSet -> rowSet.rowCount());
+  }
+
+  /**
+   * Delete a fruit from the DB.
+   *
+   * @param name Name od the fruit whose register is going to be deleted.
+   * @return The number of tuples that have been deleted from the DB.
+   */
   public Uni<Integer> delete(final String name) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#delete(String) - {}", name);
@@ -90,9 +105,12 @@ public class FruitRepository {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#findByFamily(String) - {}", family);
     }
-
     return sqlPool.preparedQuery("SELECT * FROM fruit where family =?").execute(Tuple.of(family)).onItem()
       .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
+//    return sqlPool.preparedQuery("SELECT f FROM Fruit f where family =?").execute(Tuple.of(family)).onItem()
+//      .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
+//    return sqlPool.preparedQuery("SELECT * FROM fruit where family =?").execute(Tuple.of(family)).onItem()
+//      .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
   }
 
 }

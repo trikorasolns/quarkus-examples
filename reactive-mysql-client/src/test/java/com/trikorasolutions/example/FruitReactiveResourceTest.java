@@ -84,37 +84,36 @@ public class FruitReactiveResourceTest {
     given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
   }
 
-//  @Test
-//  public void testFruitRipeReactive() {
-//    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(200)
-//      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
-//
-//    given().when().body(new Fruit("apple", "Apple", "Rosaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(200)
-//      .body(containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
-//
-//    given().when().body(new Fruit("pineapple", "Pineapple", "Bromeliaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(200)
-//      .body(containsString("\"name\":\"pineapple\""), containsString("\"description\":\"Pineapple\""));
-//
-//    given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(200)
-//      .body(containsString("\"name\":\"lemon\""), containsString("\"description\":\"Lemon\""));
-//
-//    given().when().put("/fruitreact/ripe/Rosaceae").then().statusCode(200);
-//
-//    given().when().get("/fruitreact/name/pear").then().statusCode(200)
-//      .body(containsString("\"name\":\"pear\""), containsString("\"ripen\":true"));
-//
-//    given().when().get("/fruitreact/name/apple").then().statusCode(200)
-//      .body(containsString("\"name\":\"apple\""), containsString("\"ripen\":true"));
-//
-//    given().when().get("/fruitreact/name/lemon").then().statusCode(200)
-//      .body(containsString("\"name\":\"lemon\""), containsString("\"ripen\":false"));
-//
-//    given().when().get("/fruitreact/name/pineapple").then().statusCode(200)
-//      .body(containsString("\"name\":\"pineapple\""), containsString("\"ripen\":false"));
-//
-//  }
+  @Test
+  public void testFruitRipeReactive() {
+    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
+
+    given().when().body(new Fruit("apple", "Apple", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
+
+    given().when().body(new Fruit("pineapple", "Pineapple", "Bromeliaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"pineapple\""), containsString("\"description\":\"Pineapple\""));
+
+    given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(200)
+      .body(containsString("\"name\":\"lemon\""), containsString("\"description\":\"Lemon\""));
+
+    given().when().put("/fruitreact/ripe/Rosaceae").then().statusCode(200);
+
+    given().when().get("/fruitreact/name/pear").then().statusCode(200)
+      .body(containsString("\"name\":\"pear\""), containsString("\"ripen\":true"));
+
+    given().when().get("/fruitreact/name/apple").then().statusCode(200)
+      .body(containsString("\"name\":\"apple\""), containsString("\"ripen\":true"));
+
+    given().when().get("/fruitreact/name/lemon").then().statusCode(200)
+      .body(containsString("\"name\":\"lemon\""), containsString("\"ripen\":false"));
+
+    given().when().get("/fruitreact/name/pineapple").then().statusCode(200)
+      .body(containsString("\"name\":\"pineapple\""), containsString("\"ripen\":false"));
+  }
 }

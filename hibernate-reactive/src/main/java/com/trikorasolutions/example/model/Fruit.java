@@ -22,9 +22,6 @@ public class Fruit {
   @Column(nullable = false)
   public Boolean ripen = false;
 
-//  @SequenceGenerator(name = "fruitSequence", sequenceName = "fruit_id_seq", allocationSize = 1, initialValue = 1)
-//  @GeneratedValue(generator = "fruitSequence")
-//  private Integer id;
 
   public Fruit() {
   }
@@ -41,6 +38,11 @@ public class Fruit {
     this.ripen = isRipen;
   }
 
+  @Override
+  public String toString() {
+    return "Fruit{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", family='" + family + '\'' + ", ripen=" + ripen + '}';
+  }
+
   public String getName() {
     return name;
   }
@@ -48,7 +50,6 @@ public class Fruit {
   public void setName(String name) {
     this.name = name;
   }
-
 
   public String getDescription() {
     return description;
@@ -71,6 +72,6 @@ public class Fruit {
   }
 
   public void setRipen(Boolean ripen) {
-    ripen = ripen;
+    this.ripen = ripen;
   }
 }

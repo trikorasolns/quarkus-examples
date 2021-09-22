@@ -58,6 +58,10 @@ public class Fruit {
       row.getBoolean("ripen"));
   }
 
+  @Override
+  public String toString() {
+    return "Fruit{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", family='" + family + '\'' + ", ripen=" + ripen + '}';
+  }
 
   public String getName() {
     return name;
