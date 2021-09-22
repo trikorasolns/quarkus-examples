@@ -30,10 +30,6 @@ public class FruitRepository {
     return sf.withSession(s -> s.createNamedQuery("Fruit.fetchFamily", Fruit.class).setParameter("family", family).getResultList());
   }
 
-  public Uni<Integer> update(final String name) {
-    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.delete").setParameter("name", name).executeUpdate());
-  }
-
   public Uni<Integer> delete(final String name) {
     return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.delete").setParameter("name", name).executeUpdate());
   }

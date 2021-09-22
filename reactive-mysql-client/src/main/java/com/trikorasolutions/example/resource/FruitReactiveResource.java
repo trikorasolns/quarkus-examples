@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import static javax.ws.rs.core.Response.Status.CONFLICT;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @ApplicationScoped
@@ -34,6 +35,9 @@ public class FruitReactiveResource {
     return repoFruit.create(fruit).onItem().transform(fruit1 -> {
       LOGGER.info("created fruit: {}", fruit1);
       return Response.ok(fruit1).build();
+    }).onFailure().recoverWithItem(thr -> {
+      LOGGER.info("Created duplicated fruit");
+      return Response.ok().status(CONFLICT).build();
     });
   }
 

@@ -52,18 +52,18 @@ public class FruitRepository {
   }
 
   /**
-   * Delete a fruit from the DB.
+   * Update a family of fruits from the DB.
    *
-   * @param name Name od the fruit whose register is going to be deleted.
-   * @return The number of tuples that have been deleted from the DB.
+   * @param name Name of the fruit which ripen value is going to be modified
+   * @return The fruit that has been modified.
    */
-  public Uni<Fruit> update(final String name, final Fruit fruit) {
+  public Uni<Fruit> update(final String name, final Boolean value) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("#delete(String) - {}", name);
+      LOGGER.debug("#update(String) - {}", name);
     }
-
-    return sqlPool.preparedQuery(" DELETE FROM fruit WHERE name = ?").execute(Tuple.of(name)).onItem()
-      .transform(rowSet -> rowSet.rowCount());
+    LOGGER.info("#update(String) - {}", name);
+    return sqlPool.preparedQuery("UPDATE fruit SET ripen = ? WHERE name = ? RETURNING *").execute(Tuple.of(value, name))
+      .onItem().transform(rowSet -> Fruit.from(rowSet.iterator().next()));
   }
 
   /**
@@ -107,10 +107,6 @@ public class FruitRepository {
     }
     return sqlPool.preparedQuery("SELECT * FROM fruit where family =?").execute(Tuple.of(family)).onItem()
       .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
-//    return sqlPool.preparedQuery("SELECT f FROM Fruit f where family =?").execute(Tuple.of(family)).onItem()
-//      .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
-//    return sqlPool.preparedQuery("SELECT * FROM fruit where family =?").execute(Tuple.of(family)).onItem()
-//      .transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem().transform(Fruit::from).collect().asList();
   }
 
 }

@@ -27,10 +27,6 @@ public class Fruit {
   @Column(nullable = false)
   public Boolean ripen = false;
 
-//  @SequenceGenerator(name = "fruitSequence", sequenceName = "fruit_id_seq", allocationSize = 1, initialValue = 1)
-//  @GeneratedValue(generator = "fruitSequence")
-//  private Integer id;
-
   public Fruit() {
   }
 
@@ -50,6 +46,12 @@ public class Fruit {
     this.ripen = isRipen;
   }
 
+  /**
+   * Generates a Fruit entity from a record of the DB.
+   *
+   * @param row Is the tuple with the desired values of the new Fruit.
+   * @return A new Fruit Object with the row data
+   */
   public static Fruit from(Row row) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#from(Row) - {}", row);

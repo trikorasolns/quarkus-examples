@@ -28,6 +28,6 @@ public class FruitLogic {
   public Uni<Integer> ripe(final String family) {
     return sf.withTransaction((s, t) -> repoFruit.findByFamily(family).onItem()
         .invoke(fruits -> fruits.stream().filter(fruit -> !fruit.ripen).forEach(fruit -> fruit.setRipen(Boolean.TRUE))))
-          .onItem().transform(fruits -> fruits.size());
+          .onItem().transform(filteredList -> filteredList.size());
   }
 }
