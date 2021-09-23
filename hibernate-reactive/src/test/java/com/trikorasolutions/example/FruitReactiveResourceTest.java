@@ -22,16 +22,14 @@ public class FruitReactiveResourceTest {
   @Inject
   Mutiny.SessionFactory sf;
 
-  @AfterEach
-  public void tearDown(){
+  @BeforeEach
+  public void clearDatabase() {
+
     LOGGER.warn("delete from database");
     Integer res = sf.withTransaction((s, t) -> s.createQuery("DELETE FROM Fruit").executeUpdate()).await()
       .atMost(Duration.ofSeconds(30));
     LOGGER.warn("{} records removed", res);
 
-  }
-  @BeforeEach
-  public void clearDatabase() {
     given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
       .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
