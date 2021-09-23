@@ -61,7 +61,7 @@ public class FruitRepository {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#update(String) - {}", name);
     }
-    LOGGER.info("#update(String) - {}", name);
+
     return sqlPool.preparedQuery("UPDATE fruit SET ripen = ? WHERE name = ? RETURNING *").execute(Tuple.of(value, name))
       .onItem().transform(rowSet -> Fruit.from(rowSet.iterator().next()));
   }

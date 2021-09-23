@@ -25,16 +25,13 @@ public class FruitReactiveResourceTest {
   @Inject
   Mutiny.SessionFactory sf;
 
-  @AfterEach
-  public void tearDown(){
+  @BeforeEach
+  public void clearDatabase() {
     LOGGER.warn("delete from database");
     Integer res = sf.withTransaction((s, t) -> s.createQuery("DELETE FROM Fruit").executeUpdate()).await()
       .atMost(Duration.ofSeconds(30));
     LOGGER.warn("{} records removed", res);
 
-  }
-  @BeforeEach
-  public void clearDatabase() {
     given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
       .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
@@ -44,45 +41,46 @@ public class FruitReactiveResourceTest {
       .body(containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
   }
 
-//  @Test
-//  public void testCreate() {
-//    given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
-//
-//    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(CONFLICT.getStatusCode());
-//  }
-//
-//  @Test
-//  public void testGet() {
-//    given().when().get("/fruitreact/name/unknown").then().statusCode(NOT_FOUND.getStatusCode());
-//
-//    given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
-//  }
-//
-//  @Test
-//  public void testListAll() {
-//    given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""),
-//        containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
-//
-//    given().when().delete("/fruitreact/pear").then().statusCode(OK.getStatusCode());
-//    given().when().delete("/fruitreact/apple").then().statusCode(OK.getStatusCode());
-//
-//    given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode())
-//      .body(containsString("[]"));
-//  }
-//
-//  @Test
-//  public void testDelete() {
-//    given().when().delete("/fruitreact/lemon").then().statusCode(NOT_FOUND.getStatusCode());
-//
-//    given().when().delete("/fruitreact/pear").then().statusCode(OK.getStatusCode()).body(containsString("1"));
-//
-//    given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
-//  }
+  @Test
+  public void testCreate() {
+    given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
 
+    given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType("application/json")
+      .post("/fruitreact/create").then().statusCode(CONFLICT.getStatusCode());
+  }
+
+  @Test
+  public void testGet() {
+    given().when().get("/fruitreact/name/unknown").then().statusCode(NOT_FOUND.getStatusCode());
+
+    given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""));
+  }
+
+  @Test
+  public void testListAll() {
+    given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode())
+      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""),
+        containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
+
+    given().when().delete("/fruitreact/pear").then().statusCode(OK.getStatusCode());
+    given().when().delete("/fruitreact/apple").then().statusCode(OK.getStatusCode());
+
+    given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode())
+      .body(containsString("[]"));
+  }
+
+  @Test
+  public void testDelete() {
+    given().when().delete("/fruitreact/lemon").then().statusCode(NOT_FOUND.getStatusCode());
+
+    given().when().delete("/fruitreact/pear").then().statusCode(OK.getStatusCode()).body(containsString("1"));
+
+    given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
+  }
+
+  //TODO: fix the persist with thereactive client
   @Test
   public void testUpdate() {
     given().when().body(new Fruit("pineapple", "Pineapple", "Bromeliaceae", false)).contentType("application/json")
