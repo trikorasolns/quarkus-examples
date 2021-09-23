@@ -1,38 +1,72 @@
 package com.trikorasolutions.example.model;
 
-import io.quarkus.hibernate.reactive.panache.PanacheEntity;
-import io.smallrye.mutiny.Uni;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "fruit")
 @ApplicationScoped
-public class Fruit extends PanacheEntity {
+public class Fruit extends PanacheEntityBase {
+  @Id
+  @Column(length = 50, unique = true)
+  public String name;
 
-    public String name;
-    public String description;
+  @Column(length = 200)
+  public String description;
 
-    public Fruit() {
-    }
+  @Column(length = 50)
+  public String family;
 
-    public Fruit(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+  @Column(nullable = false)
+  public Boolean ripen = false;
 
-    public static Uni<Fruit> findByName(String name) {
-        return find("name", name).firstResult();
-    }
+  public Fruit() {
+  }
 
-    // return name as uppercase in the model
-    public String getName() {
-        return name.toUpperCase();
-    }
+  public Fruit(String name) {
+    this.name = name;
+    this.description = name;
+  }
 
-    // store all names in lowercase in the DB
-    public void setName(String name) {
-        this.name = name.toLowerCase();
-    }
+  public Fruit(String name, String description) {
+    this(name);
+    this.description = description;
+  }
+
+  public Fruit(String name, String description, String family, Boolean isRipen) {
+    this(name, description);
+    this.family = family;
+    this.ripen = isRipen;
+  }
+
+  @Override
+  public String toString() {
+    return "Fruit{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", family='" + family + '\'' + ", ripen=" + ripen + '}';
+  }
+
+  public String getDescription() {return description;}
+
+  public void setDescription(String description) {this.description = description;}
+
+  public String getFamily() {return family;}
+
+  public void setFamily(String family) {this.family = family;}
+
+  public Boolean getRipen() {return ripen;}
+
+  public void setRipen(Boolean ripen) {this.ripen = ripen;}
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
 }
