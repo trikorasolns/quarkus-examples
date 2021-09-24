@@ -1,0 +1,73 @@
+= Keycloak Project
+
+:toc: left
+:icons: font
+:source-highlighter: rouge
+:description: Example project for using Keycloak in Quarkus.
+
+== Requirements
+
+=== Keycloak
+:toc:left
+//:toc-title: Tabla de Contenidos
+:icons: font
+:description: Trikora Solutions Office Manager solution introduction.
+:source-highlighter: rouge
+
+
+Reference: https://hub.docker.com/r/jboss/keycloak
+
+==== Prepare
+
+*Firewall*
+
+Open firewall ports:
+
+[source,bash]
+----
+# firewall-cmd --add-port 8090/tcp --permanent
+----
+
+Cre
+
+[source,bash]
+----
+podman pod create -p 8090:8080 -p 8543:8443 --name trikora_keycloak_quarkus_example_pod
+----
+
+Copy real json file.
+
+[source,bash]
+----
+cp src/test/resources/trikora-realm.json /tmp
+chmod 777 /tmp/trikora-realm.json
+----
+
+[source,bash]
+----
+podman run --name trikora_keycloak_quarkus_example --security-opt label=disable --rm --pod trikora_keycloak_quarkus_example_pod -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e KEYCLOAK_IMPORT=/tmp/trikora-realm.json -v /tmp/trikora-realm.json:/tmp/trikora-realm.json quay.io/keycloak/keycloak:15.0.2
+----
+https://localhost:8543/auth/
+TIP:
+`--rm` para que borre el contenedor cuando se para el pod
+
+[source,bash]
+----
+podman pod rm trikora_keycloak_quarkus_example_pod
+----
+
+== Troubleshooting
+
+=== Permission denied
+
+*Problem*
+
+[source]
+----
+FATAL [org.keycloak.services] (ServerService Thread Pool -- 58) Error during startup: java.lang.RuntimeException: java.io.FileNotFoundException: /tmp/trikora-realm.json (Permission denied)
+----
+
+*Cause*
+
+*Solution*
+--security-opt label=disable
