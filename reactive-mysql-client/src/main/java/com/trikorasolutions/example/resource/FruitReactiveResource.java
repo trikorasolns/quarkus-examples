@@ -13,7 +13,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.CONFLICT;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 @ApplicationScoped
 @Path("/fruitreact")
@@ -23,10 +24,10 @@ public class FruitReactiveResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(FruitReactiveResource.class);
 
   @Inject
-  FruitLogic logicFruit;
+  FruitRepository repoFruit;
 
   @Inject
-  FruitRepository repoFruit;
+  FruitLogic logicFruit;
 
   @POST
   @Path("/create")
@@ -55,7 +56,7 @@ public class FruitReactiveResource {
 
   @GET
   @Path("/name/{name}")
-  public Uni<Response> findByName(final @PathParam("name") String name) {
+  public Uni<Response> findByName(final @RestPath String name) {
     return repoFruit.findByName(name).onItem().transform(fruit -> {
       LOGGER.info("fetched fruit: {}", fruit);
       if (fruit != null) {
@@ -69,13 +70,17 @@ public class FruitReactiveResource {
   @GET
   @Path("/listAll")
   public Uni<Response> listAll(final @PathParam("name") String name) {
-    return repoFruit.listAll().onItem().transform(fruit -> Response.ok(fruit).build());
+    return repoFruit.listAll().onItem().transform(fruit -> {
+      return Response.ok(fruit).build();
+    });
   }
 
   @PUT
   @Path("/ripe/{family}")
   public Uni<Response> ripeFamily(final @RestPath String family) {
+    LOGGER.info("Familia {Uni<List<Fruit>>}",logicFruit.ripe(family));
     return logicFruit.ripe(family).onItem().transform(delCount -> {
+      LOGGER.info("[FUERA]ripen fruit: {}", delCount);
       if (delCount > 0) {
         return Response.ok(delCount).build();
       } else {

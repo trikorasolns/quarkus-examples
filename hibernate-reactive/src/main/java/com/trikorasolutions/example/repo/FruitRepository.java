@@ -23,15 +23,11 @@ public class FruitRepository {
   }
 
   public Uni<List<Fruit>> listAll() {
-    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.listAll", Fruit.class).getResultList());
+    return sf.withSession(s -> s.createNamedQuery("Fruit.listAll", Fruit.class).getResultList());
   }
 
   public Uni<List<Fruit>> findByFamily(String family) {
-    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.fetchFamily", Fruit.class).setParameter("family", family).getResultList());
-  }
-
-  public Uni<Integer> update(final String name) {
-    return sf.withTransaction((s, t) -> s.createNamedQuery("Fruit.delete").setParameter("name", name).executeUpdate());
+    return sf.withSession(s -> s.createNamedQuery("Fruit.fetchFamily", Fruit.class).setParameter("family", family).getResultList());
   }
 
   public Uni<Integer> delete(final String name) {

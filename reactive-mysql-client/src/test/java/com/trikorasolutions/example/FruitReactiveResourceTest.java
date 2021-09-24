@@ -3,7 +3,9 @@ package com.trikorasolutions.example;
 import com.trikorasolutions.example.model.Fruit;
 import io.quarkus.test.junit.QuarkusTest;
 import org.hibernate.reactive.mutiny.Mutiny;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,7 @@ import java.time.Duration;
 
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.containsString;
 
 @QuarkusTest
@@ -24,7 +27,6 @@ public class FruitReactiveResourceTest {
 
   @BeforeEach
   public void clearDatabase() {
-
     LOGGER.warn("delete from database");
     Integer res = sf.withTransaction((s, t) -> s.createQuery("DELETE FROM Fruit").executeUpdate()).await()
       .atMost(Duration.ofSeconds(30));
@@ -78,6 +80,7 @@ public class FruitReactiveResourceTest {
     given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
   }
 
+  //TODO: fix the persist with thereactive client
   @Test
   public void testUpdate() {
     given().when().body(new Fruit("pineapple", "Pineapple", "Bromeliaceae", false)).contentType("application/json")
