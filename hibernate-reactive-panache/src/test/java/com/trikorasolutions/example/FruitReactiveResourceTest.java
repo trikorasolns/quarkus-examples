@@ -16,6 +16,8 @@ import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.*;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @QuarkusTest
 public class FruitReactiveResourceTest {
@@ -42,7 +44,7 @@ public class FruitReactiveResourceTest {
   }
 
   @Test
-  public void get() {
+  public void testGet() {
     given().when().get("/fruitreact/name/unknown").then().statusCode(NOT_FOUND.getStatusCode());
 
     given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
@@ -58,14 +60,15 @@ public class FruitReactiveResourceTest {
   @Test
   public void testListAll() {
     given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode())
-      .body(containsString("\"name\":\"pear\""), containsString("\"description\":\"Pear\""),
-        containsString("\"name\":\"apple\""), containsString("\"description\":\"Apple\""));
+      .body("$.size()", is(2), "name", containsInAnyOrder("pear","apple")
+        , "description", containsInAnyOrder("Pear","Apple")
+        , "family", containsInAnyOrder("Rosaceae","Rosaceae"));
 
     given().when().delete("/fruitreact/pear").then().statusCode(OK.getStatusCode());
     given().when().delete("/fruitreact/apple").then().statusCode(OK.getStatusCode());
 
     given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode())
-      .body(containsString("[]"));
+      .body("$.size()", is(0));
   }
 
   @Test
@@ -77,29 +80,54 @@ public class FruitReactiveResourceTest {
     given().when().get("/fruitreact/name/pear").then().statusCode(NOT_FOUND.getStatusCode());
   }
 
-//  //TODO: fix the persist with thereactive client
+  @Test
+  public void testUpdate() {
+    given().when()
+      .body(new Fruit("pear", "Updated-Pear", "PearFam", true))
+      .contentType(MediaType.APPLICATION_JSON)
+      .put("/fruitreact/update/pear").then().statusCode(OK.getStatusCode())
+    ;
+
+    given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
+      .body("name", containsString("pear"), "description", containsString("Updated-Pear"),
+      "family", containsString("PearFam"), "ripen", is(true))
+    ;
+
+    given().when()
+      .body(new Fruit("Unknown", "Unknown", "Unknown", true))
+      .contentType(MediaType.APPLICATION_JSON)
+      .put("/fruitreact/update/Unknown").then().statusCode(CONFLICT.getStatusCode())
+    ;
+  }
+
 //  @Test
-//  public void testUpdate() {
-//    given().when().body(new Fruit("pineapple", "Pineapple", "Bromeliaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"pineapple\""), containsString("\"description\":\"Pineapple\""));
+//  public void testLogic() {
+//    given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType(MediaType.APPLICATION_JSON)
+//      .post("/fruitreact/create").then().statusCode(OK.getStatusCode());
 //
-//    given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType("application/json")
-//      .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"lemon\""), containsString("\"description\":\"Lemon\""));
+//    given().when().body(new Fruit("pineapple", "Pineapple", "Rutaceae_2", false)).contentType(MediaType.APPLICATION_JSON)
+//      .post("/fruitreact/create").then().statusCode(OK.getStatusCode());
 //
 //    given().when().put("/fruitreact/ripe/Rosaceae").then().statusCode(OK.getStatusCode());
 //
 //    given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"pear\""), containsString("\"ripen\":true"));
+//      .body("name", containsString("pear"), "description", containsString("Pear"),
+//        "family", containsString("Rosaceae"), "ripen", is(true))
+//    ;
 //
 //    given().when().get("/fruitreact/name/apple").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"apple\""), containsString("\"ripen\":true"));
+//      .body("name", containsString("apple"), "description", containsString("Apple"),
+//        "family", containsString("Rosaceae"), "ripen", is(true))
+//    ;
 //
 //    given().when().get("/fruitreact/name/lemon").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"lemon\""), containsString("\"ripen\":false"));
+//      .body("name", containsString("lemon"), "description", containsString("Lemon"),
+//        "family", containsString("Rutaceae"), "ripen", is(false))
+//    ;
 //
 //    given().when().get("/fruitreact/name/pineapple").then().statusCode(OK.getStatusCode())
-//      .body(containsString("\"name\":\"pineapple\""), containsString("\"ripen\":false"));
+//      .body("name", containsString("pineapple"), "description", containsString("Pineapple"),
+//        "family", containsString("Rutaceae_2"), "ripen", is(false))
+//    ;
 //  }
 }

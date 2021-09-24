@@ -1,8 +1,9 @@
 package com.trikorasolutions.example.resource;
 
 import com.trikorasolutions.example.Startup;
+import com.trikorasolutions.example.logic.FruitLogic;
 import com.trikorasolutions.example.model.Fruit;
-import com.trikorasolutions.example.repository.FruitRepository;
+import com.trikorasolutions.example.repo.FruitRepository;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Uni;
 import org.jboss.resteasy.reactive.RestPath;
@@ -28,12 +29,17 @@ public class FruitReactiveResource {
 
   @Inject
   FruitRepository repoFruit;
+
+  @Inject
+  FruitLogic logicFruit;
+
   @POST
   @Path("/create")
   public Uni<Response> create(final Fruit fruit) {
     return repoFruit.create(fruit).onItem().transform(fruit1 -> {
       LOGGER.info("created fruit: {}", fruit1);
       return Response.ok(fruit1).build();
+
     }).onFailure().recoverWithItem(thr -> {
       LOGGER.info("Created duplicated fruit");
       return Response.ok().status(CONFLICT).build();
@@ -43,7 +49,7 @@ public class FruitReactiveResource {
   @GET
   @Path("/name/{name}")
   public Uni<Response> findByName(final @RestPath("name") String name) {
-    return repoFruit.findById(name).onItem().transform(fruit -> {
+    return repoFruit.findByName(name).onItem().transform(fruit -> {
       LOGGER.info("fetched fruit: {}", fruit);
       if (fruit != null) {
           return Response.ok(fruit).build();
@@ -57,7 +63,7 @@ public class FruitReactiveResource {
   @Path("/{name}")
   @ReactiveTransactional
   public Uni<Response> delete(final @RestPath String name) {
-    return repoFruit.deleteById(name).onItem().transform(deleted -> {
+    return repoFruit.remove(name).onItem().transform(deleted -> {
       LOGGER.info("deleted fruit: {}", deleted);
       if (deleted) {
         return Response.ok().build();
@@ -70,22 +76,35 @@ public class FruitReactiveResource {
   @GET
   @Path("/listAll")
   public Uni<Response> listAll(final @PathParam("name") String name) {
-    return repoFruit.listAll().onItem().transform(fruit -> {
-      return Response.ok(fruit).build();
+    return repoFruit.listAll().onItem().transform(fruit -> Response.ok(fruit).build());
+  }
+
+  @PUT
+  @Path("/update/{name}")
+  public Uni<Response> update(final Fruit fruit) {
+    return repoFruit.change(fruit).onItem().transform(fruit1 -> {
+      LOGGER.info("updated fruit: {}", fruit1);
+      return Response.ok(fruit1).build();
+
+    }).onFailure().recoverWithItem(thr -> {
+      LOGGER.info("The Fruit that you are trying to update does not exit {}");
+      return Response.ok(thr.getMessage()).status(CONFLICT).build();
     });
   }
 
-//  @PUT
-//  @Path("/ripe/{family}")
-//  public Uni<Response> ripeFamily(final @RestPath String family) {
-//    LOGGER.info("Familia {Uni<List<Fruit>>}",logicFruit.ripe(family));
-//    return logicFruit.ripe(family).onItem().transform(delCount -> {
-//      LOGGER.info("[FUERA]ripen fruit: {}", delCount);
-//      if (delCount > 0) {
-//        return Response.ok(delCount).build();
-//      } else {
-//        return Response.ok().status(NOT_FOUND).build();
-//      }
-//    });
-//  }
+  // TODO: This method do not persist
+  @PUT
+  @Path("/ripe/{family}")
+  public Uni<Response> ripeFamily(final @RestPath String family) {
+    LOGGER.info("Familia {Uni<List<Fruit>>} {}",family);
+
+    return logicFruit.ripe(family).onItem().transform(delCount -> {
+      LOGGER.info("[FUERA]ripen fruit: {}", delCount);
+      if (delCount > 0) {
+        return Response.ok(delCount).build();
+      } else {
+        return Response.ok().status(NOT_FOUND).build();
+      }
+    });
+  }
 }

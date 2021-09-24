@@ -28,7 +28,7 @@ dependencies {
   implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
   // Console
   implementation 'io.quarkus:quarkus-smallrye-health'
-  implementation 'io.quarkus:quarkus-smallrye-graphql'
+//  implementation 'io.quarkus:quarkus-smallrye-graphql'
   implementation 'io.quarkus:quarkus-smallrye-openapi'
   // Test
   testImplementation 'io.quarkus:quarkus-junit5'

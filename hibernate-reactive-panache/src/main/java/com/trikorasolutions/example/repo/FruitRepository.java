@@ -1,4 +1,4 @@
-package com.trikorasolutions.example.repository;
+package com.trikorasolutions.example.repo;
 
 import com.trikorasolutions.example.model.Fruit;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
@@ -22,21 +22,32 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
     return this.persist(fruit);
   }
 
+  /**
+   * Update the fields of a fruit but preserving its id (name)
+   *
+   * @param fruit Fruit that is going to be persisted in the DB.
+   * @return A new updated instance of the Fruit that has been persisted in the DB.
+   */
   @ReactiveTransactional
-  public Uni<Fruit> update(Fruit fruit) {
-    return this.persist(fruit);
+  public Uni<Fruit> change(Fruit fruit) {
+    return this.findById(fruit.name).onItem().call(f->{
+      f.setDescription(fruit.description);
+      f.setFamily(fruit.family);
+      f.setRipen(fruit.ripen);
+      return f.persist();}
+    );
   }
 
-//  /**
-//   * Search a fruit in the DB.
-//   *
-//   * @param name name of the fruit that is going to be searched in the DB.
-//   * @return A new instance of a Fruit object if it is already stored in the DB or
-//   * null otherwise.
-//   */
-//  public Uni<Fruit> findByName(String name) {
-//    return this.findById(name);
-//  }
+  /**
+   * Search a fruit in the DB.
+   *
+   * @param name name of the fruit that is going to be searched in the DB.
+   * @return A new instance of a Fruit object if it is already stored in the DB or
+   * null otherwise.
+   */
+  public Uni<Fruit> findByName(String name) {
+    return this.findById(name);
+  }
 
   /**
    * Delete a fruit from the DB.
@@ -45,18 +56,9 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
    * @return The number of tuples that have been deleted from the DB.
    */
   @ReactiveTransactional
-  public Uni<Long> remove(final String name) {
-    return this.delete(name);
+  public Uni<Boolean> remove(final String name) {
+    return this.deleteById(name);
   }
-
-//  /**
-//   * List all the elements that are available in the fruit table.
-//   *
-//   * @return A list with all the tuples of the table.
-//   */
-//  public Uni<List<Fruit>> listAll() {
-//    return this.listAll();
-//  }
 
   /**
    * Search all the fruits of a concrete family in the DB.
@@ -66,15 +68,6 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
    */
   public Uni<List<Fruit>> findByFamily(String family) {
     return this.list("family", family);
-  }
-
-  /**
-   * Count the number of record in the Fruit table.
-   *
-   * @return The number of fruit thatare persisted in the DB.
-   */
-  public Uni<Long> count(){
-    return this.count();
   }
 
 }
