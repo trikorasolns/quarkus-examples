@@ -12,6 +12,10 @@ include::hibernate-reactive/README.adoc[leveloffset=+2]
 
 include::hibernate-reactive-panache/README.adoc[leveloffset=+2]
 
+include::reactive-mysql-client/README.adoc[leveloffset=+2]
+
+include::keycloak/README.adoc[leveloffset=+2]
+
 == Building all subprojects
 
 Build all subprojects by calling the `quarkusBuildSubprojects` task.

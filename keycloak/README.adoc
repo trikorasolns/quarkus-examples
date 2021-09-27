@@ -40,7 +40,7 @@ Copy real json file.
 [source,bash]
 ----
 cp src/test/resources/trikora-realm.json /tmp
-chmod 777 /tmp/trikora-realm.json
+#chmod 777 /tmp/trikora-realm.json
 ----
 
 [source,bash]
