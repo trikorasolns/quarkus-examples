@@ -57,4 +57,13 @@ public class UserResource {
     return Uni.createFrom().item(Response.ok(UserLogic.load(this.keycloakSecurityContext, this.jwt)).build());
   }
 
+  @GET
+  @Path("/me")
+  @NoCache
+  public Uni<Response> checkAccessUsr(){
+    // This resource just check the access, so it can  return anything in the response
+    return Uni.createFrom().item(Response.ok(this.keycloakSecurityContext.getPrincipal().getName()
+      + "is accessing the service").build());
+  }
+
 }

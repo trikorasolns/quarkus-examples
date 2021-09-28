@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
+import static javax.ws.rs.core.Response.Status.*;
 
 
 @QuarkusTest
@@ -32,24 +33,24 @@ public class UserResourceTest {
   public void testRoles() {
 
     RestAssured.given().auth().oauth2(getAccessToken("alice")).when().contentType(MediaType.APPLICATION_JSON)
-      .get("/api/users/roles").then().statusCode(200).contentType(MediaType.APPLICATION_JSON)
+      .get("/api/users/roles").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
       .body("userRoles", containsInAnyOrder("user"));
 
     RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
-      .get("/api/users/roles").then().statusCode(200).contentType(MediaType.APPLICATION_JSON)
+      .get("/api/users/roles").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
       .body("userRoles", containsInAnyOrder("user", "confidential"));
 
   }
 
   @Test
   public void testInfo() {
-    LOGGER.info("eeeeeeeeeeeeeeeeeeeee{}",
+    LOGGER.info("RESPONSE IN JSON FORMAT: {}",
       RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
-        .get("/api/users/userinfo").then().statusCode(200).contentType(MediaType.APPLICATION_JSON).extract().response()
+        .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON).extract().response()
         .jsonPath().prettyPrint());
 
       RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
-        .get("/api/users/userinfo").then().statusCode(200).contentType(MediaType.APPLICATION_JSON)
+        .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
         .body("userName", is("jdoe"),
           "givenName",is("John"), // <==>"givenName", Matchers.containsString("John"),
           "familyName", is("Doe"),

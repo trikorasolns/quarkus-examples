@@ -5,6 +5,8 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.AccessTokenResponse;
+import static javax.ws.rs.core.Response.Status.*;
+
 
 @QuarkusTest
 public class PolicyEnforcerTest {
@@ -16,40 +18,40 @@ public class PolicyEnforcerTest {
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-//    @Test
+    @Test
     public void testAccessUserResource() {
         RestAssured.given().auth().oauth2(getAccessToken("alice"))
                 .when().get("/api/users/me")
                 .then()
-                .statusCode(200);
+                .statusCode(OK.getStatusCode());
         RestAssured.given().auth().oauth2(getAccessToken("jdoe"))
                 .when().get("/api/users/me")
                 .then()
-                .statusCode(200);
+                .statusCode(OK.getStatusCode());
     }
 
-//    @Test
+    @Test
     public void testAccessAdminResource() {
         RestAssured.given().auth().oauth2(getAccessToken("alice"))
                 .when().get("/api/admin")
                 .then()
-                .statusCode(403);
+                .statusCode(FORBIDDEN.getStatusCode());
         RestAssured.given().auth().oauth2(getAccessToken("jdoe"))
                 .when().get("/api/admin")
                 .then()
-                .statusCode(403);
+                .statusCode(FORBIDDEN.getStatusCode());
         RestAssured.given().auth().oauth2(getAccessToken("admin"))
                 .when().get("/api/admin")
                 .then()
-                .statusCode(200);
+                .statusCode(OK.getStatusCode());
     }
 
-//    @Test
+    @Test
     public void testPublicResource() {
         RestAssured.given()
                 .when().get("/api/public")
                 .then()
-                .statusCode(204);
+                .statusCode(NO_CONTENT.getStatusCode());
     }
 
     private String getAccessToken(String userName) {

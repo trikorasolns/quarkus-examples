@@ -21,7 +21,7 @@ public class HelloResourceTest {
     RestAssured.useRelaxedHTTPSValidation();
   }
 
-//  @Test
+  @Test
   public void testPublicResource() {
     RestAssured.given()
       .when().get("/hello/msg/Keycloak")

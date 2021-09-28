@@ -1,60 +1,68 @@
 = Keycloak Project
-
-:toc: left
-:icons: font
-:source-highlighter: rouge
-:description: Example project for using Keycloak in Quarkus.
-
-== Requirements
-
-=== Keycloak
-:toc:left
-//:toc-title: Tabla de Contenidos
-:icons: font
-:description: Trikora Solutions Office Manager solution introduction.
-:source-highlighter: rouge
+:hardbreaks:
 
 
-Reference: https://hub.docker.com/r/jboss/keycloak
+== Set Up
 
-==== Prepare
-
-*Firewall*
+==== Firewall
 
 Open firewall ports:
 
+TIP: It is not mandatory to perform this step unless you have compatibility problems
+with yor firewall.
+
 [source,bash]
 ----
-# firewall-cmd --add-port 8090/tcp --permanent
+firewall-cmd --add-port 8090/tcp --permanent
+firewall-cmd --add-port 8043/tcp --permanent
+
 ----
 
-Cre
+
+==== Create a podman for keyclock
+
+IMPORTANT: It is necessary to map two ports since one is needed for the keycloak console.
+In our case, we map the 8090 with the 8080 because we are currently using the 8080
+in another project.
 
 [source,bash]
 ----
 podman pod create -p 8090:8080 -p 8543:8443 --name trikora_keycloak_quarkus_example_pod
 ----
 
-Copy real json file.
+===== Delete the previous pod
+[source,bash]
+----
+podman pod rm trikora_keycloak_quarkus_example_pod
+----
 
+NOTE: You can see if there is any pod process active with the command:
+`podman ps --all`, therefore, you can get the name of the pods which are running in order to kill them.
+
+
+==== Run the pod
+
+Firstly it is necessary to copy the realm.json in the tmp directory, as this directory is volatile, you have to do this operation each time you restart your PC.
+Beware: You need to be located in your root project directory in order to perform the following command.
 [source,bash]
 ----
 cp src/test/resources/trikora-realm.json /tmp
-#chmod 777 /tmp/trikora-realm.json
 ----
+Then we can execute:
 
 [source,bash]
 ----
 podman run --name trikora_keycloak_quarkus_example --security-opt label=disable --rm --pod trikora_keycloak_quarkus_example_pod -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e KEYCLOAK_IMPORT=/tmp/trikora-realm.json -v /tmp/trikora-realm.json:/tmp/trikora-realm.json quay.io/keycloak/keycloak:15.0.2
 ----
-https://localhost:8543/auth/
-TIP:
-`--rm` para que borre el contenedor cuando se para el pod
 
-[source,bash]
-----
-podman pod rm trikora_keycloak_quarkus_example_pod
-----
+NOTE: the --rm flag is set for deleting the pod after the execution. You can kill the process with `^C`.
+
+== Actions in the keycloak console.
+
+* Link to keycloak console: https://localhost:8543/auth/admin/master/console/#/realms/quarkus
+
+== Export realm json file.
+TODO
 
 == Troubleshooting
 
@@ -68,6 +76,9 @@ FATAL [org.keycloak.services] (ServerService Thread Pool -- 58) Error during sta
 ----
 
 *Cause*
+The pod has not enough permissions for accessing the realm.json file.
 
 *Solution*
---security-opt label=disable
+When running the pod, we should add the `--security-opt label=disable` flag.
+
+
