@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 
+import static com.trikorasolutions.example.KeycloakInfo.getAccessToken;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static javax.ws.rs.core.Response.Status.*;
@@ -21,8 +22,7 @@ public class UserResourceTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserResourceTest.class);
 
-  private static final String KEYCLOAK_SERVER_URL = System.getProperty("keycloak.url", "https://localhost:8543/auth");
-  private static final String KEYCLOAK_REALM = "quarkus";
+
 
   static {
     RestAssured.useRelaxedHTTPSValidation();
@@ -64,10 +64,4 @@ public class UserResourceTest {
         );
   }
 
-  private String getAccessToken(String userName) {
-    return RestAssured.given().param("grant_type", "password").param("username", userName).param("password", userName)
-      .param("client_id", "backend-service").param("client_secret", "secret").when()
-      .post(KEYCLOAK_SERVER_URL + "/realms/" + KEYCLOAK_REALM + "/protocol/openid-connect/token")
-      .as(AccessTokenResponse.class).getToken();
-  }
 }

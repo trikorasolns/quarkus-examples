@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AdminResource {
-  private static final Logger LOGGER = LoggerFactory.getLogger(HelloResource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AdminResource.class);
 
   @Inject
   SecurityIdentity keycloakSecurityContext;
