@@ -19,10 +19,6 @@ public class AdminResourceTest {
 
     @Test
     public void testAccessUserResource() {
-        RestAssured.given().auth().oauth2(getAccessToken("alice"))
-                .when().get("/api/users/me")
-                .then()
-                .statusCode(OK.getStatusCode());
         RestAssured.given().auth().oauth2(getAccessToken("jdoe"))
                 .when().get("/api/users/me")
                 .then()
@@ -31,10 +27,6 @@ public class AdminResourceTest {
 
     @Test
     public void testAccessAdminResource() {
-        RestAssured.given().auth().oauth2(getAccessToken("alice"))
-                .when().get("/api/admin")
-                .then()
-                .statusCode(FORBIDDEN.getStatusCode());
         RestAssured.given().auth().oauth2(getAccessToken("jdoe"))
                 .when().get("/api/admin")
                 .then()

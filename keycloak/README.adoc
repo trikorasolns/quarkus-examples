@@ -54,11 +54,13 @@ cp src/test/resources/trikora-realm.json /tmp/keycloak_tmp/
 ----
 Then we can execute:
 
+NOTE: The flag `-e KEYCLOAK_IMPORT=/tmp/trikora-realm.json`
+
 [source,bash]
 ----
 podman run --name trikora_keycloak_quarkus_example --security-opt label=disable \
   --rm --pod trikora_keycloak_quarkus_example_pod \
-  -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin -e KEYCLOAK_IMPORT=/tmp/trikora-realm-old.json \
+  -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin  \
   -v /tmp/keycloak_tmp/:/tmp/ \
   quay.io/keycloak/keycloak:15.0.2
 ----
@@ -122,10 +124,24 @@ podman exec -it trikora_keycloak_quarkus_example /opt/jboss/keycloak/bin/standal
  -Dkeycloak.migration.provider=singleFile \
  -Dkeycloak.migration.realmName=trikorasolutions \
  -Dkeycloak.migration.usersExportStrategy=REALM_FILE \
- -Dkeycloak.migration.file=/tmp/my_realm.json
+ -Dkeycloak.migration.file=/tmp/trikora-realm.json
 ----
 
 === Import
+[source,bash]
+----
+ [podman | docker] exec -it <container_name> <PATH_TO_KEYCLOAK_IN_THE_POD>/bin/standalone.sh
+ -Djboss.socket.binding.port-offset=100
+ -Dkeycloak.migration.action=import
+ -Dkeycloak.migration.provider=singleFile
+ -Dkeycloak.migration.realmName=quarkus
+ -Dkeycloak.migration.usersExportStrategy=REALM_FILE
+ -Dkeycloak.migration.file=<FILE_TO_IMPORT>
+ -Dkeycloak.profile.feature.upload_scripts=enabled
+ -Dkeycloak.profile.feature.scripts=enabled
+ -Dkeycloak.migration.strategy=[OVERWRITE_EXISTING | IGNORE_EXISTING]
+----
+
 
 [source,bash]
 ----
@@ -133,20 +149,13 @@ podman exec -it trikora_keycloak_quarkus_example /opt/jboss/keycloak/bin/standal
  -Djboss.socket.binding.port-offset=100 \
  -Dkeycloak.migration.action=import \
  -Dkeycloak.migration.provider=singleFile \
- -Dkeycloak.migration.realmName=quarkus \
+ -Dkeycloak.migration.realmName=trikorasolutions \
  -Dkeycloak.migration.usersExportStrategy=REALM_FILE \
- -Dkeycloak.migration.file=/tmp/my_realm.json \
+ -Dkeycloak.migration.file=/tmp/trikora-realm.json \
+ -Dkeycloak.profile.feature.upload_scripts=enabled \
+ -Dkeycloak.profile.feature.scripts=enabled \
  -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
 ----
-
-NOTE:  [podman | docker] exec -it <container_name> <PATH_TO_KEYCLOAK_IN_THE_POD>/bin/standalone.sh
- -Djboss.socket.binding.port-offset=100
- -Dkeycloak.migration.action=import
- -Dkeycloak.migration.provider=singleFile
- -Dkeycloak.migration.realmName=quarkus
- -Dkeycloak.migration.usersExportStrategy=REALM_FILE
- -Dkeycloak.migration.file=<FILE_TO_IMPORT>
- -Dkeycloak.migration.strategy=[OVERWRITE_EXISTING | IGNORE_EXISTING]
 
 == Import several files in a single realm
 * If we have stored the data of the project split in several files, we can merge it in a single project just by importing the files as they are a list separated by commas:
@@ -156,9 +165,17 @@ WARNING: You cannot use the keycloak.import parameter with keycloak.migration.X 
 If you use these parameters together, keycloak.import parameter will be ignored. The keycloak.import mechanism ignores the realms which already exist in the project.
 The keycloak.import mechanism is convenient for development purposes, but if more flexibility is needed, use the keycloak.migration.X parameters.
 
+== References
+
+Useful discussions about this problem:
+https://keycloak.discourse.group/t/cant-import-realm-using-docker-image/259/13
+https://stackoverflow.com/questions/53390134/keycloak-script-authenticator-missing
+https://issues.redhat.com/browse/KEYCLOAK-13823?jql=project%20%3D%20KEYCLOAK%20AND%20text%20~%20import
+
+
 == Troubleshooting
 
-=== Permission denied when running the piod
+=== Permission denied when running the pod
 
 *Problem*
 
@@ -173,4 +190,23 @@ The pod has not enough permissions for accessing the realm.json file.
 *Solution*
 When running the pod, we should add the `--security-opt label=disable` flag.
 
+:hardbreaks:
 
+=== Cannot import a realm when running the pod
+*Problem*
+
+[source]
+----
+07:37:13,702 WARN  [org.keycloak.services] (ServerService Thread Pool -- 68) KC-SERVICES0005: Unable to import realm trikorasolutions from file /tmp/trikora-realm.json.: java.lang.RuntimeException: Script upload is disabled
+	at org.keycloak.keycloak-authz-policy-common@15.0.2//org.keycloak.authorization.policy.provider.js.JSPolicyProviderFactory.updatePolicy(JSPolicyProviderFactory.java:125)
+	at org.keycloak.keycloak-authz-policy-common@15.0.2//org.keycloak.authorization.policy.provider.js.JSPolicyProviderFactory.onImport(JSPolicyProviderFactory.java:70)
+----
+*Cause*
+From keycloak version 7.0.1 onwards, it is not possible to import a realm.json file since it is considered a deprecated way.
+
+*Solution*
+Adding the flag "-e -Dkeycloak.profile.feature.upload_scripts=enabled" does not work, so the only solution is to run podman with an empty master realm and then
+import ours.
+
+Other possible solution to try would be launch keycloak in version 6.0.0 with the realm and then update keycloak.
+Or using: https://www.keycloak.org/docs/latest/server_development/#_script_providers

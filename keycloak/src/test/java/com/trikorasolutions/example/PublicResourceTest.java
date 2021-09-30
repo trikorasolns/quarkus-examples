@@ -33,7 +33,7 @@ public class PublicResourceTest {
    */
   @Test
   public void testPublicResourceWithAuth() {
-    RestAssured.given().auth().oauth2(getAccessToken("alice"))
+    RestAssured.given().auth().oauth2(getAccessToken("mrtriangle"))
       .when().get("/api/public/msg/Keycloak")
       .then()
       .statusCode(FORBIDDEN.getStatusCode());
