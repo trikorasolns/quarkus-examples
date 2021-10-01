@@ -35,18 +35,6 @@ public class UserResource {
   @Path("/userinfo")
   @NoCache
   public Uni<Response> getUserInfo() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("##################################################");
-      LOGGER.debug("########### PRINTING CURRENT USER INFO ###########");
-      ObjectMapper mapper = new ObjectMapper();
-      LOGGER.info("credentials{}", this.keycloakSecurityContext.getCredentials());
-      LOGGER.info("Attributes{}", this.keycloakSecurityContext.getAttributes());
-      LOGGER.info("permissions{}", this.keycloakSecurityContext.getAttribute("permissions").toString());
-      LOGGER.info("roles{}", this.keycloakSecurityContext.getRoles());
-      jwt.getClaimNames().forEach(x -> LOGGER.info("CLAIM {}: {}", x, jwt.getClaim(x).toString()));
-      LOGGER.debug("##################################################");
-    }
-
     return Uni.createFrom().item(Response.ok(UserLogic.load(this.keycloakSecurityContext, this.jwt)).build());
   }
 

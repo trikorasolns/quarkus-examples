@@ -171,6 +171,19 @@ The keycloak.import mechanism is convenient for development purposes, but if mor
 https://www.keycloak.org/docs/latest/authorization_services/#_resource_server_overview
 https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/export-import.adoc
 
+KEYCLOAK CRUD:
+https://github.com/keycloak/keycloak/tree/master/testsuite/integration-arquillian/tests/base/src/test/java/org/keycloak/testsuite/admin
+https://www.appsdeveloperblog.com/keycloak-requesting-token-with-password-grant/
+https://www.appsdeveloperblog.com/oauth-2-implicit-grant-type-flow-example/
+https://keycloak.discourse.group/t/rest-api-create-user-no-user-identifier-in-response/1964/11
+https://www.keycloak.org/docs-api/9.0/rest-api/index.html#_client_registration_policy_resource
+https://lists.jboss.org/pipermail/keycloak-user/2017-January/009016.html
+== Endpoints
+Keycloak allows the user to interact with the system from an OpenID connection which is based on REST, you can see a list of the different endpoints here:
+https://localhost:<CONSOLE_PORT>/auth/realms/<REALM_NAME>/.well-known/openid-configuration
+
+In our application it would be:
+https://localhost:8543/auth/realms/trikorasolutions/.well-known/openid-configuration
 
 == Troubleshooting
 

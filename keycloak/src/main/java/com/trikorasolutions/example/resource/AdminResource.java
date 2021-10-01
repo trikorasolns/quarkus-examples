@@ -1,5 +1,6 @@
 package com.trikorasolutions.example.resource;
 
+import com.trikorasolutions.example.bl.UserLogic;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.jboss.resteasy.reactive.NoCache;
@@ -12,6 +13,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import javax.ws.rs.PathParam;
+
 @ApplicationScoped
 @Path("/api/admin")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,6 +25,9 @@ public class AdminResource {
   @Inject
   SecurityIdentity keycloakSecurityContext;
 
+  @Inject
+  UserLogic user;
+
   @GET
   @Path("/")
   @NoCache
@@ -29,6 +35,17 @@ public class AdminResource {
     // This resource just check the access, so it can  return anything in the response
     return Uni.createFrom().item(Response.ok(this.keycloakSecurityContext.getPrincipal().getName()
       + "is accessing the service").build());
+  }
+
+  @GET
+  @Path("/listUsers/{realm}")
+  @NoCache
+  public Uni<Response> listUsers(@PathParam("realm") String realm) {
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("listUsers: {}", realm);
+    }
+    // This resource just check the access, so it can  return anything in the response
+    return Uni.createFrom().item(Response.ok(user.listAll(realm)).build());
   }
 
 }

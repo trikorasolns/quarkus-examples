@@ -1,5 +1,6 @@
 package com.trikorasolutions.example;
 
+import com.trikorasolutions.example.resource.UserResourceTest;
 import io.quarkus.test.junit.NativeImageTest;
 
 @NativeImageTest

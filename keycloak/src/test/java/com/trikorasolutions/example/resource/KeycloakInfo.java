@@ -1,4 +1,4 @@
-package com.trikorasolutions.example;
+package com.trikorasolutions.example.resource;
 
 import io.restassured.RestAssured;
 import org.keycloak.representations.AccessTokenResponse;
@@ -21,3 +21,12 @@ public class KeycloakInfo {
       .as(AccessTokenResponse.class).getToken();
   }
 }
+/* --data-urlencode == Querry param
+
+curl --location --request POST 'https://localhost:8543/auth/realms/trikorasolutions/protocol/openid-connect/token' \
+  --header 'Content-Type: application/json' \
+  --data-urlencode 'password=jdoe' \
+  --data-urlencode 'username=jdoe' \
+  --data-urlencode 'client_id=backend-service' \
+  --data-urlencode 'grant_type=password'
+ */

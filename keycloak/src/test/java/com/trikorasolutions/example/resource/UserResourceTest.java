@@ -1,4 +1,4 @@
-package com.trikorasolutions.example;
+package com.trikorasolutions.example.resource;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 
-import static com.trikorasolutions.example.KeycloakInfo.getAccessToken;
+import static com.trikorasolutions.example.resource.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;
 
 
@@ -36,11 +36,6 @@ public class UserResourceTest {
 
   @Test
   public void testInfo() {
-    LOGGER.info("RESPONSE IN JSON FORMAT: {}",
-      RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
-        .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON).extract().response()
-        .jsonPath().prettyPrint());
-
       RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
         .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
         .body("userName", Matchers.is("jdoe"),
