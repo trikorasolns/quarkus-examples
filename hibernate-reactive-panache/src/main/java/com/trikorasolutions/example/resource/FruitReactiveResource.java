@@ -80,7 +80,7 @@ public class FruitReactiveResource {
   }
 
   @PUT
-  @Path("/update/{name}")
+  @Path("/update")
   public Uni<Response> update(final Fruit fruit) {
     return repoFruit.change(fruit).onItem().transform(fruit1 -> {
       LOGGER.info("updated fruit: {}", fruit1);
