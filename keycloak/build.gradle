@@ -1,0 +1,44 @@
+plugins {
+  id 'java'
+  id 'io.quarkus'
+}
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+dependencies {
+  implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+  implementation 'io.quarkus:quarkus-arc'
+  // KeyClock
+  implementation 'io.quarkus:quarkus-keycloak-authorization'
+
+  // Rest
+  implementation 'io.quarkus:quarkus-resteasy-reactive'
+  implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+  // Console
+  implementation 'io.quarkus:quarkus-smallrye-health'
+  implementation 'io.quarkus:quarkus-smallrye-graphql'
+  implementation 'io.quarkus:quarkus-smallrye-openapi'
+  // Test
+  testImplementation 'io.quarkus:quarkus-junit5'
+  testImplementation 'io.rest-assured:rest-assured'
+}
+
+group 'com.trikorasolutions.example'
+version '1.0.0-SNAPSHOT'
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
+compileJava {
+  options.encoding = 'UTF-8'
+  options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+  options.encoding = 'UTF-8'
+}
