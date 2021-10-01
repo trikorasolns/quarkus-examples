@@ -23,6 +23,11 @@ public class AdminResourceTest {
                 .when().get("/api/users/me")
                 .then()
                 .statusCode(OK.getStatusCode());
+
+        RestAssured.given().auth().oauth2(getAccessToken("admin"))
+          .when().get("/api/users/me")
+          .then()
+          .statusCode(OK.getStatusCode());
     }
 
     @Test
@@ -31,6 +36,7 @@ public class AdminResourceTest {
                 .when().get("/api/admin")
                 .then()
                 .statusCode(FORBIDDEN.getStatusCode());
+
         RestAssured.given().auth().oauth2(getAccessToken("admin"))
                 .when().get("/api/admin")
                 .then()

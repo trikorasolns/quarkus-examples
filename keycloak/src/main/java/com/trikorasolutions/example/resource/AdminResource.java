@@ -1,10 +1,7 @@
 package com.trikorasolutions.example.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.trikorasolutions.example.bl.UserLogic;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.resteasy.reactive.NoCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +25,6 @@ public class AdminResource {
   @Inject
   SecurityIdentity keycloakSecurityContext;
 
-  @Inject
-  JsonWebToken jwt;
 
   @GET
   @Path("/")

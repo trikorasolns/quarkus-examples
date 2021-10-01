@@ -34,11 +34,11 @@ public class UserResourceTest {
 
     RestAssured.given().auth().oauth2(getAccessToken("mrsquare")).when().contentType(MediaType.APPLICATION_JSON)
      .get("/api/users/roles").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
-      ;//.body("userRoles", containsInAnyOrder("user"));
+      .body("userRoles", Matchers.hasItem("user"));
 
     RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
       .get("/api/users/roles").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
-      ;//.body("userRoles", Matchers.arrayContaining("user", "confidential"));
+      .body("userRoles", Matchers.hasItems("user", "confidential"));
 
   }
 
@@ -51,16 +51,16 @@ public class UserResourceTest {
 
       RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
         .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
-        .body("userName", is("jdoe"),
-          "givenName",is("John"), // <==>"givenName", Matchers.containsString("John"),
-          "familyName", is("Doe"),
-          "email", is("johndoe@trikorasolutions.com"),
-          //"userRoles", Matchers.containsInAnyOrder("user","confidential"),
-          "userRoles.size()",is(5),
+        .body("userName", Matchers.is("jdoe"),
+          "givenName", Matchers.is("John"), // <==>"givenName", Matchers.containsString("John"),
+          "familyName", Matchers.is("Doe"),
+          "email", Matchers.is("johndoe@trikorasolutions.com"),
+          "userRoles", Matchers.hasItems("user","confidential"),
+          "userRoles.size()", Matchers.is(5),
           "userCredentials.type", Matchers.containsInAnyOrder("bearer"),
           "userCredentials.token[0]", Matchers.containsString("ey"),
-          //"userPermissions.rsname", Matchers.contains("User Resource"),
-          "userPermissions[0].size()",is(2)
+          "userPermissions.rsname[0]", Matchers.matchesRegex("^[a-zA-Z0-9_ ]*$"),
+          "userPermissions[0].size()", Matchers.is(2)
         );
   }
 
