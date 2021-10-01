@@ -43,5 +43,4 @@ public class PublicResourceTest {
       .then()
       .statusCode(FORBIDDEN.getStatusCode());
   }
-
 }

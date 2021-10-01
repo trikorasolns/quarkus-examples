@@ -65,5 +65,4 @@ public class UserResource {
     return Uni.createFrom().item(Response.ok(this.keycloakSecurityContext.getPrincipal().getName()
       + "is accessing the service").build());
   }
-
 }

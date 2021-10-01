@@ -21,6 +21,5 @@ public class UserLogic  {
       .setFamilyName(jwt.getClaim("family_name"))
       .setGroups(jwt.getClaim("groups"))
     ;
-
   }
 }

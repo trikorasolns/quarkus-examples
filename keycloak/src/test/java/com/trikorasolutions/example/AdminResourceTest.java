@@ -1,14 +1,11 @@
 package com.trikorasolutions.example;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.Test;
-import org.keycloak.representations.AccessTokenResponse;
 
 import static com.trikorasolutions.example.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;
-
 
 @QuarkusTest
 public class AdminResourceTest {
