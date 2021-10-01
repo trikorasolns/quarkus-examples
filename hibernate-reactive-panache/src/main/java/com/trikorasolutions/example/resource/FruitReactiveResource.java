@@ -75,7 +75,7 @@ public class FruitReactiveResource {
 
   @GET
   @Path("/listAll")
-  public Uni<Response> listAll(final @PathParam("name") String name) {
+  public Uni<Response> listAll() {
     return repoFruit.listAll().onItem().transform(fruit -> Response.ok(fruit).build());
   }
 
