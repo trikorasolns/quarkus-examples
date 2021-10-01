@@ -6,13 +6,13 @@
 :description: Example project for using Hibernate Reactive Panache in Quarkus.
 :hardbreaks:
 
-== Set Up
+== Set Up (version 15.0.2)
 
 ==== Firewall
 
 Open firewall ports:
 
-TIP: It is not mandatory to perform this step unless you have compatibility problems
+TIP: It is not mandatory to perform this step unless you have compatibility issues
 with yor firewall.
 
 [source,bash]
@@ -40,13 +40,13 @@ podman pod rm trikora_keycloak_quarkus_example_pod
 ----
 
 NOTE: You can see if there is any pod process active with the command:
-`podman ps --all`, therefore, you can get the name of the pods which are running in order to kill them.
+`podman pod ps --all`, therefore, you can get the name of the pods which are running in order to kill them.
 
 
 ==== Run the pod
 
-Firstly it is necessary to copy the realm.json in the tmp directory, as this directory is volatile, you have to do this operation each time you restart your PC.
-Beware: You need to be located in your root project directory in order to perform the following command.
+Firstly it is necessary to copy the realm.json in the tmp/keycloak_tmp/ (local) directory. As this directory is volatile, you have to do this operation each time you restart your PC.
+You need to be located in your project root directory in order to perform the following commands.
 [source,bash]
 ----
 mkdir /tmp/keycloak_tmp/
@@ -54,7 +54,8 @@ cp src/test/resources/trikora-realm.json /tmp/keycloak_tmp/
 ----
 Then we can execute:
 
-NOTE: The flag `-e KEYCLOAK_IMPORT=/tmp/trikora-realm.json`
+NOTE: In the current version of keycloak, it is not possible to run keycloak with an initial database, so we have to run the pod with an empty keycloak and then
+import the realm.json with the command line (see below). For that reason the flag `-e KEYCLOAK_IMPORT=/tmp/trikora-realm.json` has been removed from the run command.
 
 [source,bash]
 ----
@@ -82,7 +83,6 @@ https://localhost:8543/auth/admin/master/console/#/realms/quarkus/roles
 * If the user section, we can edit all the information regarding the user such as the email, password ...
 but indeed we have the possibility of assigning new roles to the user as well as enroll them to different groups.
 
-`TODO` Create permission add it to a role and then assign it to a group of users
 
 == Security Management
 * In this section we will describe how keycloak filter the URLs with the proper permissions.
@@ -105,7 +105,7 @@ Link: https://localhost:8543/auth/admin/master/console/#/realms/quarkus/clients/
 [source,shell script]
 ----
 [podman | docker] exec -it <pod_name> opt/jboss/keycloak/bin/standalone.sh
-        -Djboss.socket.binding.port-offset=100
+        -Djboss.socket.binding.port-offset=<interger_value> Docker recommend  an offset of 100 at least
         -Dkeycloak.migration.action=[export | import]
         -Dkeycloak.migration.provider=[singleFile | dir]
         -Dkeycloak.migration.dir=<DIR TO EXPORT TO> Use only iff .migration.provider=dir
@@ -141,7 +141,9 @@ podman exec -it trikora_keycloak_quarkus_example /opt/jboss/keycloak/bin/standal
  -Dkeycloak.profile.feature.scripts=enabled
  -Dkeycloak.migration.strategy=[OVERWRITE_EXISTING | IGNORE_EXISTING]
 ----
-
+IMPORTANT: When a realm is imported from the command line, the keycloak console is not updated due to a version bug. In order to see the imported realm, it is
+necessary to create another realm (empty, only need to enter the realm name). This action will force the console table to be updated, this is a keycloak bug so
+we hope that it could be fixed in futures releases.
 
 [source,bash]
 ----
@@ -166,11 +168,8 @@ If you use these parameters together, keycloak.import parameter will be ignored.
 The keycloak.import mechanism is convenient for development purposes, but if more flexibility is needed, use the keycloak.migration.X parameters.
 
 == References
-
-Useful discussions about this problem:
-https://keycloak.discourse.group/t/cant-import-realm-using-docker-image/259/13
-https://stackoverflow.com/questions/53390134/keycloak-script-authenticator-missing
-https://issues.redhat.com/browse/KEYCLOAK-13823?jql=project%20%3D%20KEYCLOAK%20AND%20text%20~%20import
+https://www.keycloak.org/docs/latest/authorization_services/#_resource_server_overview
+https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/export-import.adoc
 
 
 == Troubleshooting
@@ -178,7 +177,6 @@ https://issues.redhat.com/browse/KEYCLOAK-13823?jql=project%20%3D%20KEYCLOAK%20A
 === Permission denied when running the pod
 
 *Problem*
-
 [source]
 ----
 FATAL [org.keycloak.services] (ServerService Thread Pool -- 58) Error during startup: java.lang.RuntimeException: java.io.FileNotFoundException: /tmp/trikora-realm.json (Permission denied)
@@ -206,7 +204,7 @@ From keycloak version 7.0.1 onwards, it is not possible to import a realm.json f
 
 *Solution*
 Adding the flag "-e -Dkeycloak.profile.feature.upload_scripts=enabled" does not work, so the only solution is to run podman with an empty master realm and then
-import ours.
+import ours from the command line.
 
 Other possible solution to try would be launch keycloak in version 6.0.0 with the realm and then update keycloak.
 Or using: https://www.keycloak.org/docs/latest/server_development/#_script_providers
