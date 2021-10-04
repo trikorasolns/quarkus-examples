@@ -1,6 +1,5 @@
 package com.trikorasolutions.example.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trikorasolutions.example.bl.UserLogic;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
@@ -11,10 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -31,11 +27,25 @@ public class UserResource {
   @Inject
   JsonWebToken jwt;
 
+  @Inject
+  UserLogic user;
+
   @GET
   @Path("/userinfo")
   @NoCache
   public Uni<Response> getUserInfo() {
     return Uni.createFrom().item(Response.ok(UserLogic.load(this.keycloakSecurityContext, this.jwt)).build());
+  }
+
+  @GET
+  @Path("/kcuserinfo/{realm}")
+  @NoCache
+  public Uni<Response> getUs(@PathParam("realm") String realm) {
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("listUsers: {}", realm);
+    }
+    // This resource just check the access, so it can  return anything in the response
+    return Uni.createFrom().item(Response.ok(user.keycloakUserInfo(realm,keycloakSecurityContext)).build());
   }
 
   @GET

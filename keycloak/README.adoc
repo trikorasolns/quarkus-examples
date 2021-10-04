@@ -70,11 +70,11 @@ NOTE: the --rm flag is set for deleting the pod after the execution. You can kil
 
 == Actions in the keycloak console
 
-* Link to keycloak console: https://localhost:8543/auth/admin/master/console/#/realms/quarkus
+* Link to keycloak console: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions
 
 ==== Roles
 * We can access the roles section by the left navigator in the main page or clicking here:
-https://localhost:8543/auth/admin/master/console/#/realms/quarkus/roles
+https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions/roles
 
 * In this section we can add roles to our application that will be saved in the realms.json that we have located in the tmp directory.
 
@@ -88,7 +88,7 @@ but indeed we have the possibility of assigning new roles to the user as well as
 * In this section we will describe how keycloak filter the URLs with the proper permissions.
 
 * Firstly, we have to locate in Clients -> backend-service -> Authorization -> Settings -> Resources.
-Link: https://localhost:8543/auth/admin/master/console/#/realms/quarkus/clients/0ac5df91-e044-4051-bd03-106a3a5fb9cc/authz/resource-server/resource
+Link: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions/clients/0ac5df91-e044-4051-bd03-106a3a5fb9cc/authz/resource-server/resource
 
 * Then, we have to create a new resource where we will establish the URLs that are going to be restricted. For doing so, there is a button `Create` in the upper-right side of the main layout.
 
@@ -181,6 +181,15 @@ https://lists.jboss.org/pipermail/keycloak-user/2017-January/009016.html
 == Endpoints
 Keycloak allows the user to interact with the system from an OpenID connection which is based on REST, you can see a list of the different endpoints here:
 https://localhost:<CONSOLE_PORT>/auth/realms/<REALM_NAME>/.well-known/openid-configuration
+
+
+***
+https://github.com/keycloak/keycloak-documentation/blob/master/securing_apps/topics/oidc/oidc-generic.adoc
+https://openid.net/specs/openid-connect-core-1_0.html#UserInfo
+https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_users_resource
+https://stackoverflow.com/questions/55535440/how-to-get-users-from-keycloak-rest-api/55539390
+
+***
 
 In our application it would be:
 https://localhost:8543/auth/realms/trikorasolutions/.well-known/openid-configuration

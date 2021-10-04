@@ -13,6 +13,7 @@ dependencies {
   implementation 'io.quarkus:quarkus-arc'
   // KeyClock
   implementation 'io.quarkus:quarkus-keycloak-authorization'
+  implementation 'io.rest-assured:rest-assured'
 
   // Rest
   implementation 'io.quarkus:quarkus-resteasy-reactive'

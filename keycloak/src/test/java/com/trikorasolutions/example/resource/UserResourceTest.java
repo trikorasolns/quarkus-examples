@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 
-import static com.trikorasolutions.example.resource.KeycloakInfo.getAccessToken;
+import static com.trikorasolutions.example.bl.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;
 
 
@@ -36,6 +36,12 @@ public class UserResourceTest {
 
   @Test
   public void testInfo() {
+
+//    LOGGER.info("USERINFO:{}", RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
+//      .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON).extract().response().prettyPrint());
+
+
+
       RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
         .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
         .body("userName", Matchers.is("jdoe"),
@@ -48,5 +54,7 @@ public class UserResourceTest {
           "userCredentials.token[0]", Matchers.containsString("ey"),
           "userPermissions.rsname[0]", Matchers.matchesRegex("^[a-zA-Z0-9_ ]*$"),
           "userPermissions[0].size()", Matchers.is(2));
+
+      // TODO: kcuserinfo
   }
 }

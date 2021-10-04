@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.trikorasolutions.example.resource.KeycloakInfo.getAccessToken;
+import static com.trikorasolutions.example.bl.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;
 
 @QuarkusTest
@@ -41,7 +41,6 @@ public class AdminResourceTest {
         .then()
         .statusCode(OK.getStatusCode());
   }
-
 
   @Test
   public void testListKeycloakUsers() {

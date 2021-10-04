@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static org.hamcrest.Matchers.is;
-import static com.trikorasolutions.example.resource.KeycloakInfo.getAccessToken;
+import static com.trikorasolutions.example.bl.KeycloakInfo.getAccessToken;
 
 @QuarkusTest
 public class PublicResourceTest {
