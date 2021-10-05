@@ -42,9 +42,26 @@ public class UserDto {
   @JsonbProperty("userRoles")
   public Set<String> userRoles;
 
+  @JsonbProperty("enabled")
+  public Boolean enabled;
+
   @JsonbCreator
   public UserDto(@JsonbProperty("userName") String name) {
     this.userName = name;
+  }
+
+  @JsonbCreator
+  public UserDto(@JsonbProperty("givenName") String givenName,
+                 @JsonbProperty("familyName") String familyName,
+                 @JsonbProperty("email") String email,
+                 @JsonbProperty("enabled") Boolean enabled,
+                 @JsonbProperty("userName") String userName) {
+
+    this.givenName = givenName;
+    this.familyName = familyName;
+    this.email = email;
+    this.enabled = enabled;
+    this.userName = userName;
   }
 
   public UserDto setUserName(String userName) {

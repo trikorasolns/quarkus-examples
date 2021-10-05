@@ -1,19 +1,16 @@
 package com.trikorasolutions.example.bl;
 
 import com.trikorasolutions.example.dto.UserDto;
-import com.trikorasolutions.example.keycloakclient.KeycloakAuthAdminResource;
-import com.trikorasolutions.example.keycloakclient.KeycloakAuthorizationResource;
+import com.trikorasolutions.example.keycloak.clientresource.KeycloakAuthAdminResource;
+import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
-import org.apache.commons.lang3.ObjectUtils;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonArray;
-import javax.json.JsonObject;
 
 @ApplicationScoped
 public class UserAdminLogic {
@@ -29,4 +26,14 @@ public class UserAdminLogic {
         "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),
         realm, "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID);
   }
+
+  public Uni<JsonArray> createUser(final String realm, final SecurityIdentity keycloakSecurityContext,
+                                   final UserDto newUser) {
+    LOGGER.info("New user (in logic) : {}", newUser.toString());
+
+    return keycloakClient.createUser(
+      "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),
+      realm, "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, UserLogic.toUserRepresentation(newUser));
+  }
+
 }

@@ -2,6 +2,8 @@ package com.trikorasolutions.example.resource;
 
 import com.trikorasolutions.example.bl.UserAdminLogic;
 import com.trikorasolutions.example.bl.UserLogic;
+import com.trikorasolutions.example.dto.UserDto;
+import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -57,6 +59,19 @@ public class AdminResource {
     }
 
     return user.listAll(realm, keycloakSecurityContext).onItem().transform(userList->Response.ok(userList).build());
+  }
+
+  @POST
+  @Path("/{realm}/users")
+  @NoCache
+  public Uni<Response> createUser(@PathParam("realm") String realm, final UserDto newUser) {
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("createUser: {}", realm);
+      printKeycloakInfo(keycloakSecurityContext, Optional.of(jwt));
+    }
+
+    return user.createUser(realm, keycloakSecurityContext, newUser)
+      .onItem().transform(userList->Response.ok(userList).build());
   }
 
 }

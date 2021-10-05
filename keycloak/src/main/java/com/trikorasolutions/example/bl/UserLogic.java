@@ -1,7 +1,8 @@
 package com.trikorasolutions.example.bl;
 
 import com.trikorasolutions.example.dto.UserDto;
-import com.trikorasolutions.example.keycloakclient.KeycloakAuthorizationResource;
+import com.trikorasolutions.example.keycloak.clientresource.KeycloakAuthorizationResource;
+import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -30,6 +31,15 @@ public class UserLogic {
       .setFamilyName(jwt.getClaim("family_name")).setGroups(jwt.getClaim("groups"));
   }
 
+  public static UserRepresentation toUserRepresentation(UserDto from) {
+    return new UserRepresentation(from.givenName, from.familyName, from.email,
+      from.enabled, from.userName);
+  }
+
+  public static UserDto toUserDto(UserRepresentation from) {
+    return new UserDto(from.firstName, from.lastName, from.email,
+      from.enabled, from.username);
+  }
 
   /**
    *
