@@ -96,6 +96,15 @@ Link: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions
 
 * If a user without the proper permissions tries to access the service, keycloak will return a http response with status 403 (FORBIDDEN).
 
+=== `How to give an Admin access to the real management endpoints`
+
+It is important to have at least one user with enough privileges to communicate with keycloak through the REST endpoints, in order to develop such a thing you
+can create a new group and then in the "role-mappings" section of the desired group, then click on "client-roles" after that select the "realm-management" client.
+
+At this point, you should see the roles in the "Available Roles" window. Select the roles you want give to the group and click on "Add selected".
+
+Lastly, do not forget to add the admin user to the group in the Users section of the keycloak console.
+
 == Backup and Restore
 * As the keycloak admin console does not allow exporting users, we highly recommend using the command line solution in order to fully export your project.
 
@@ -181,7 +190,7 @@ https://lists.jboss.org/pipermail/keycloak-user/2017-January/009016.html
 == Endpoints
 Keycloak allows the user to interact with the system from an OpenID connection which is based on REST, you can see a list of the different endpoints here:
 https://localhost:<CONSOLE_PORT>/auth/realms/<REALM_NAME>/.well-known/openid-configuration
-
+https://stackoverflow.com/questions/46470477/how-to-get-keycloak-users-via-rest-without-admin-account/46558530#46558530
 
 ***
 https://github.com/keycloak/keycloak-documentation/blob/master/securing_apps/topics/oidc/oidc-generic.adoc
