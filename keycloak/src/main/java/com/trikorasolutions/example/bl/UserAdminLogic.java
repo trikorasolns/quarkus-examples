@@ -29,11 +29,20 @@ public class UserAdminLogic {
 
   public Uni<JsonArray> createUser(final String realm, final SecurityIdentity keycloakSecurityContext,
                                    final UserDto newUser) {
-    LOGGER.info("New user (in logic) : {}", newUser.toString());
+//    LOGGER.info("New user (in logic) : {}", newUser.toString());
 
     return keycloakClient.createUser(
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),
       realm, "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, UserLogic.toUserRepresentation(newUser));
+  }
+
+  public Uni<JsonArray> updateUser(final String realm, final SecurityIdentity keycloakSecurityContext,
+                                   final String userId, final UserDto newUser) {
+//    LOGGER.info("Updated user (in logic) : {}", newUser.toString());
+
+    return keycloakClient.updateUser(
+      "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),
+      realm, "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, userId, UserLogic.toUserRepresentation(newUser));
   }
 
 }

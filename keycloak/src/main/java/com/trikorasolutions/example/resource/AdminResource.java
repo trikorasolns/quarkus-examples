@@ -74,4 +74,18 @@ public class AdminResource {
       .onItem().transform(userList->Response.ok(userList).build());
   }
 
+  @PUT
+  @Path("/{realm}/users/{id}")
+  @NoCache
+  public Uni<Response> createUser(@PathParam("realm") String realm, @PathParam("id") String userId,
+                                  final UserDto newUser) {
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("createUser: {}", realm);
+      printKeycloakInfo(keycloakSecurityContext, Optional.of(jwt));
+    }
+
+    return user.updateUser(realm, keycloakSecurityContext, userId, newUser)
+      .onItem().transform(userList->Response.ok(userList).build());
+  }
+
 }

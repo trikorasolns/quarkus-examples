@@ -25,4 +25,12 @@ public interface KeycloakAuthAdminResource {
                          @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
                          @QueryParam("client_id") String clientId, UserRepresentation body);
 
+  @PUT
+  @Path("/realms/{realm}/users/{id}")
+  @Produces("application/json")
+  Uni<JsonArray> updateUser(@HeaderParam("Authorization") String bearerToken,
+                            @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                            @QueryParam("client_id") String clientId, @QueryParam("id") String id,
+                            UserRepresentation body);
+
 }
