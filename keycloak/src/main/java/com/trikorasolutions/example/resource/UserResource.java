@@ -40,12 +40,12 @@ public class UserResource {
   @GET
   @Path("/kcuserinfo/{realm}")
   @NoCache
-  public Uni<Response> getUs(@PathParam("realm") String realm) {
+  public Uni<Response> getUserInfoKC(@PathParam("realm") String realm) {
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("listUsers: {}", realm);
     }
-    // This resource just check the access, so it can  return anything in the response
-    return Uni.createFrom().item(Response.ok(user.keycloakUserInfo(realm,keycloakSecurityContext)).build());
+
+    return user.keycloakUserInfo(realm,keycloakSecurityContext).onItem().transform(userInfo->Response.ok(userInfo).build());
   }
 
   @GET

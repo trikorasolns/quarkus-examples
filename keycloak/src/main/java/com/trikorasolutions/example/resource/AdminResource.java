@@ -55,8 +55,8 @@ public class AdminResource {
       LOGGER.info("listUsers: {}", realm);
       printKeycloakInfo(keycloakSecurityContext, Optional.of(jwt));
     }
-    // This resource just check the access, so it can  return anything in the response
-    return Uni.createFrom().item(Response.ok(user.listAll(realm, keycloakSecurityContext)).build());
+
+    return user.listAll(realm, keycloakSecurityContext).onItem().transform(userList->Response.ok(userList).build());
   }
 
 }
