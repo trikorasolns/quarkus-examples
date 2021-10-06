@@ -2,8 +2,29 @@ package com.trikorasolutions.example.keycloak.dto;
 
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class UserRepresentation {
+  public class UserDtoCredential {
+    @JsonbProperty("type")
+    public String type;
+
+    @JsonbProperty("value")
+    public String value;
+
+    @JsonbProperty("temporary")
+    public Boolean temporary;
+
+    @JsonbCreator
+    public UserDtoCredential(@JsonbProperty("value") String name){
+      this.value = name;
+      this.type = "password";
+      this.temporary = false;
+    }
+
+  }
+
   @JsonbProperty("firstName")
   public String firstName;
 
@@ -19,6 +40,9 @@ public class UserRepresentation {
   @JsonbProperty("username")
   public String username;
 
+  @JsonbProperty("credentials")
+  public Set<UserDtoCredential> credentials;
+
   @JsonbCreator
   public UserRepresentation(@JsonbProperty("firstName")String firstName,
                             @JsonbProperty("lastName") String lastName,
@@ -31,6 +55,7 @@ public class UserRepresentation {
     this.email = email;
     this.enabled = enabled;
     this.username = username;
+    this.credentials = Set.of(this.new UserDtoCredential(username));
   }
 
   @JsonbCreator
@@ -40,10 +65,7 @@ public class UserRepresentation {
     this.email = newUser.email;
     this.enabled = newUser.enabled;
     this.username = newUser.username;
+    this.credentials = Set.of(this.new UserDtoCredential(newUser.username));
   }
 
-  @Override
-  public String toString() {
-    return "{" + "firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\'' + ", enabled='" + enabled + '\'' + ", username='" + username + '\'' + '}';
-  }
 }

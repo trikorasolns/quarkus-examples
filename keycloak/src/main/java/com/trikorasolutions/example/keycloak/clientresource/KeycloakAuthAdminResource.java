@@ -30,7 +30,21 @@ public interface KeycloakAuthAdminResource {
   @Produces("application/json")
   Uni<JsonArray> updateUser(@HeaderParam("Authorization") String bearerToken,
                             @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
-                            @QueryParam("client_id") String clientId, @QueryParam("id") String id,
+                            @QueryParam("client_id") String clientId, @PathParam("id") String id,
                             UserRepresentation body);
+
+  @GET
+  @Path("/realms/{realm}/users")
+  @Produces("application/json")
+  Uni<JsonArray> getUserInfo(@HeaderParam("Authorization") String bearerToken,
+                             @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                             @QueryParam("client_id") String clientId, @QueryParam("username") String username);
+
+  @DELETE
+  @Path("/realms/{realm}/users/{id}")
+  @Produces("application/json")
+  Uni<JsonArray> deleteUser(@HeaderParam("Authorization") String bearerToken,
+                             @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                             @QueryParam("client_id") String clientId, @PathParam("id") String id);
 
 }

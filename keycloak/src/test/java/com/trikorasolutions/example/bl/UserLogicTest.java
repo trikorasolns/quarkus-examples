@@ -19,7 +19,7 @@ public class UserLogicTest {
   @Test
   public void testUserInfo() {
 
-//    LOGGER.warn("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX {}",
+//    LOGGER.info("TestUserInfo {}",
 //      RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
 //        .get("/api/users/kcuserinfo/trikorasolutions").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
 //        .extract().response().prettyPrint());

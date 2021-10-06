@@ -9,6 +9,7 @@ import java.util.Set;
 
 
 public class UserDto {
+
   @JsonbProperty("userName")
   public String userName;
 
