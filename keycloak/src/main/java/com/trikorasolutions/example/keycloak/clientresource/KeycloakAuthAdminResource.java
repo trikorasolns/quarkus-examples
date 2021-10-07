@@ -1,6 +1,7 @@
 package com.trikorasolutions.example.keycloak.clientresource;
 
 import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
+import io.restassured.response.Response;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
@@ -22,8 +23,8 @@ public interface KeycloakAuthAdminResource {
   @Path("/realms/{realm}/users")
   @Produces("application/json")
   Uni<JsonArray> createUser(@HeaderParam("Authorization") String bearerToken,
-                         @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
-                         @QueryParam("client_id") String clientId, UserRepresentation body);
+                           @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                           @QueryParam("client_id") String clientId, UserRepresentation body);
 
   @PUT
   @Path("/realms/{realm}/users/{id}")

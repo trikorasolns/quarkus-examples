@@ -34,13 +34,8 @@ public class UserResourceTest {
       .body("userRoles", Matchers.hasItems("user", "confidential"));
   }
 
-//  @Test
+  @Test
   public void testInfo() {
-
-//    LOGGER.info("USERINFO:{}", RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
-//      .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON).extract().response().prettyPrint());
-
-
 
       RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
         .get("/api/users/userinfo").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)

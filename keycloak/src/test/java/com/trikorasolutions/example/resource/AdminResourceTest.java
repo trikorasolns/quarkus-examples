@@ -2,12 +2,9 @@ package com.trikorasolutions.example.resource;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Response;
 
 import static com.trikorasolutions.example.bl.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;

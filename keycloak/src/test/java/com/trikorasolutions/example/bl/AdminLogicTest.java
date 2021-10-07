@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.MediaType;
-
 import static com.trikorasolutions.example.bl.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;
 
@@ -24,27 +22,20 @@ public class AdminLogicTest {
       .then()
       .statusCode(OK.getStatusCode())
       .body("$.size().toString()", Matchers.greaterThanOrEqualTo("4"),
-        "username.chars", Matchers.containsInAnyOrder("jdoe","admin", "mrsquare", "mrtriangle")
+        "username.chars", Matchers.hasItems("jdoe","admin", "mrsquare", "mrtriangle")
       );
   }
 
   @Test
   public void testCRUDUsers() {
-    RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .contentType("application/json")
-      .delete("/api/admin/trikorasolutions/users/mrrectangule")
-    ;
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
       .contentType("application/json")
       .get("/api/admin/trikorasolutions/users/unknown")
       .then()
-      .statusCode(OK.getStatusCode())
-      .body("$.size()", Matchers.is(0),
-        "email.chars", Matchers.empty()
-      );
+      .statusCode(NOT_FOUND.getStatusCode())
+    ;
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
@@ -54,7 +45,9 @@ public class AdminLogicTest {
       .post("/api/admin/trikorasolutions/users")
       .then()
       .statusCode(OK.getStatusCode())
-    ;
+      .body(
+        "email", Matchers.containsString("mrrectangule@trikorasolutions.com")
+      );
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
@@ -78,21 +71,35 @@ public class AdminLogicTest {
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
+      .body(new UserDto("mr","rectangle","updatedmail@trikorasolutions.com",
+        true,"mrrectangule"))
+      .contentType("application/json")
+      .put("/api/admin/trikorasolutions/unknown")
+      .then()
+      .statusCode(NOT_FOUND.getStatusCode())
+    ;
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when()
       .contentType("application/json")
       .get("/api/admin/trikorasolutions/users/mrrectangule")
       .then()
       .statusCode(OK.getStatusCode())
-      .body("$.size()", Matchers.is(1),
-        "email.chars", Matchers.hasItem("updatedmail@trikorasolutions.com")
+      .body(
+        "email", Matchers.containsString("updatedmail@trikorasolutions.com")
       );
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
       .contentType("application/json")
       .delete("/api/admin/trikorasolutions/users/mrrectangule")
-      .then()
-      .statusCode(OK.getStatusCode());
+    ;
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when()
+      .contentType("application/json")
+      .delete("/api/admin/trikorasolutions/users/mrrectangule")
+    ;
 
   }
-
 }

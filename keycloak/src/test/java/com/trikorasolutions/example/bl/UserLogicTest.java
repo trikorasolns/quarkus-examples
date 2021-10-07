@@ -19,18 +19,14 @@ public class UserLogicTest {
   @Test
   public void testUserInfo() {
 
-//    LOGGER.info("TestUserInfo {}",
-//      RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
-//        .get("/api/users/kcuserinfo/trikorasolutions").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
-//        .extract().response().prettyPrint());
-
     RestAssured.given().auth().oauth2(getAccessToken("jdoe")).when().contentType(MediaType.APPLICATION_JSON)
       .get("/api/users/kcuserinfo/trikorasolutions").then().statusCode(OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
-      .body("preferred_username.chars", Matchers.is("jdoe"),
-        "given_name.chars", Matchers.is("John"),
-        "family_name.chars", Matchers.is("Doe"),
-        "email.chars", Matchers.is("johndoe@trikorasolutions.com")
+      .body("userName", Matchers.is("jdoe"),
+        "givenName", Matchers.is("John"),
+        "familyName", Matchers.is("Doe"),
+        "email", Matchers.is("johndoe@trikorasolutions.com"),
+        "enabled", Matchers.is(true)
       );
   }
-
 }
+

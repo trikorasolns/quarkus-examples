@@ -38,7 +38,7 @@ public class UserDto {
   public Collection<Object> userPermissions;
 
   @JsonbProperty("userCredentials")
-  public Set<Credential>  userCredentials;
+  public Set<Credential> userCredentials;
 
   @JsonbProperty("userRoles")
   public Set<String> userRoles;
@@ -46,17 +46,16 @@ public class UserDto {
   @JsonbProperty("enabled")
   public Boolean enabled;
 
+  public UserDto() {
+  }
+
   @JsonbCreator
   public UserDto(@JsonbProperty("userName") String name) {
     this.userName = name;
   }
 
   @JsonbCreator
-  public UserDto(@JsonbProperty("givenName") String givenName,
-                 @JsonbProperty("familyName") String familyName,
-                 @JsonbProperty("email") String email,
-                 @JsonbProperty("enabled") Boolean enabled,
-                 @JsonbProperty("userName") String userName) {
+  public UserDto(@JsonbProperty("givenName") String givenName, @JsonbProperty("familyName") String familyName, @JsonbProperty("email") String email, @JsonbProperty("enabled") Boolean enabled, @JsonbProperty("userName") String userName) {
 
     this.givenName = givenName;
     this.familyName = familyName;
@@ -105,12 +104,12 @@ public class UserDto {
     return this;
   }
 
-  public UserDto setUserPermissions(Collection<Object>  userPermissions) {
+  public UserDto setUserPermissions(Collection<Object> userPermissions) {
     this.userPermissions = userPermissions;
     return this;
   }
 
-  public UserDto setUserCredentials(Set<Credential>  userCredentials) {
+  public UserDto setUserCredentials(Set<Credential> userCredentials) {
     this.userCredentials = userCredentials;
     return this;
   }
@@ -118,5 +117,10 @@ public class UserDto {
   public UserDto setUserRoles(Set<String> userRoles) {
     this.userRoles = userRoles;
     return this;
+  }
+
+  @Override
+  public String toString() {
+    return "UserDto{" + "userName='" + userName + '\'' + ", givenName='" + givenName + '\'' + ", familyName='" + familyName + '\'' + ", nickName='" + nickName + '\'' + ", preferredUsername='" + preferredUsername + '\'' + ", email='" + email + '\'' + ", emailVerified='" + emailVerified + '\'' + ", groups=" + groups + ", userPermissions=" + userPermissions + ", userCredentials=" + userCredentials + ", userRoles=" + userRoles + ", enabled=" + enabled + '}';
   }
 }

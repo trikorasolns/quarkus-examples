@@ -3,6 +3,7 @@ package com.trikorasolutions.example.bl;
 import com.trikorasolutions.example.dto.UserDto;
 import com.trikorasolutions.example.keycloak.clientresource.KeycloakAuthAdminResource;
 import io.quarkus.security.identity.SecurityIdentity;
+import io.restassured.response.Response;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
@@ -20,16 +21,16 @@ public class UserAdminLogic {
   KeycloakAuthAdminResource keycloakClient;
 
   public Uni<JsonArray> listAll(final String realm, final SecurityIdentity keycloakSecurityContext) {
-
     return keycloakClient.listAll(
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
       "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID);
   }
 
   public Uni<UserDto> createUser(final String realm, final SecurityIdentity keycloakSecurityContext, final UserDto newUser) {
-    return keycloakClient.createUser(
+   return keycloakClient.createUser(
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
-      "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, UserLogic.toUserRepresentation(newUser)).onItem().transform(jsonValues -> UserDto::fromKeycloakJso);
+      "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, UserLogic.toUserRepresentation(newUser)
+   ).replaceWith(this.getUserInfo(realm, keycloakSecurityContext, newUser.userName));
   }
 
   public Uni<JsonArray> updateUser(final String realm, final SecurityIdentity keycloakSecurityContext, final String userId, final UserDto newUser) {
@@ -38,23 +39,25 @@ public class UserAdminLogic {
       "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, userId, UserLogic.toUserRepresentation(newUser));
   }
 
-  public Uni<JsonArray> getUserInfo(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
-
+  public Uni<UserDto> getUserInfo(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
     return keycloakClient.getUserInfo(
         "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
-        "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, name)
-      ;
+        "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, name).onItem().transform(UserLogic::from);
   }
-  public Uni<String> nameToId(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
 
+  public Uni<String> nameToId(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
     return keycloakClient.getUserInfo(
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
       "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, name)
-    .onItem().transform(userInfo -> userInfo.get(0).asJsonObject().getString("id"));
+    .onItem().transform(userInfo ->{
+      if (userInfo != null)
+        return userInfo.get(0).asJsonObject().getString("id");
+      else
+        return null;
+    });
   }
 
   public Uni<JsonArray> deleteUser(final String realm, final SecurityIdentity keycloakSecurityContext, final String id) {
-
     return keycloakClient.deleteUser(
         "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
         "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID, id);
