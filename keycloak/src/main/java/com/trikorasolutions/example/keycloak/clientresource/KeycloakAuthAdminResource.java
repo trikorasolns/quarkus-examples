@@ -1,7 +1,6 @@
 package com.trikorasolutions.example.keycloak.clientresource;
 
 import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
-import io.restassured.response.Response;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 

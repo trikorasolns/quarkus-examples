@@ -3,7 +3,6 @@ package com.trikorasolutions.example.keycloak.clientresource;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.ws.rs.*;
 

@@ -3,12 +3,12 @@
 :toc: left
 :icons: font
 :source-highlighter: rouge
-:description: Example project for using Hibernate Reactive Panache in Quarkus.
+:description: Example project for using Quarkus.
 :hardbreaks:
 
 == Set Up (version 15.0.2)
 
-==== Firewall
+=== Firewall
 
 Open firewall ports:
 
@@ -22,7 +22,7 @@ firewall-cmd --add-port 8043/tcp --permanent
 ----
 
 
-==== Create a podman for keyclock
+=== Create a podman for keyclock
 
 IMPORTANT: It is necessary to map two ports since one is needed for the keycloak console.
 In our case, we map the 8090 with the 8080 because we are currently using the 8080
@@ -33,7 +33,7 @@ in another project.
 podman pod create -p 8090:8080 -p 8543:8443 --name trikora_keycloak_quarkus_example_pod
 ----
 
-===== Delete the previous pod
+==== Delete the previous pod
 [source,bash]
 ----
 podman pod rm trikora_keycloak_quarkus_example_pod
@@ -43,7 +43,7 @@ NOTE: You can see if there is any pod process active with the command:
 `podman pod ps --all`, therefore, you can get the name of the pods which are running in order to kill them.
 
 
-==== Run the pod
+=== Run the pod
 
 Firstly it is necessary to copy the realm.json in the tmp/keycloak_tmp/ (local) directory. As this directory is volatile, you have to do this operation each time you restart your PC.
 You need to be located in your project root directory in order to perform the following commands.
@@ -72,13 +72,13 @@ NOTE: the --rm flag is set for deleting the pod after the execution. You can kil
 
 * Link to keycloak console: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions
 
-==== Roles
+=== Roles
 * We can access the roles section by the left navigator in the main page or clicking here:
 https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions/roles
 
 * In this section we can add roles to our application that will be saved in the realms.json that we have located in the tmp directory.
 
-==== User Management
+=== User Management
 
 * If the user section, we can edit all the information regarding the user such as the email, password ...
 but indeed we have the possibility of assigning new roles to the user as well as enroll them to different groups.
@@ -177,31 +177,27 @@ If you use these parameters together, keycloak.import parameter will be ignored.
 The keycloak.import mechanism is convenient for development purposes, but if more flexibility is needed, use the keycloak.migration.X parameters.
 
 == References
-https://www.keycloak.org/docs/latest/authorization_services/#_resource_server_overview
-https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/export-import.adoc
 
-KEYCLOAK CRUD:
-https://github.com/keycloak/keycloak/tree/master/testsuite/integration-arquillian/tests/base/src/test/java/org/keycloak/testsuite/admin
-https://www.appsdeveloperblog.com/keycloak-requesting-token-with-password-grant/
-https://www.appsdeveloperblog.com/oauth-2-implicit-grant-type-flow-example/
-https://keycloak.discourse.group/t/rest-api-create-user-no-user-identifier-in-response/1964/11
-https://www.keycloak.org/docs-api/9.0/rest-api/index.html#_client_registration_policy_resource
-https://lists.jboss.org/pipermail/keycloak-user/2017-January/009016.html
-== Endpoints
+*Import and Export:*
+
+* https://www.keycloak.org/docs/latest/authorization_services/#_resource_server_overview
+* https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/export-import.adoc
+
+*Keycloak CRUD:*
+
+* https://www.keycloak.org/docs-api/9.0/rest-api/index.html#_client_registration_policy_resource
+* https://www.appsdeveloperblog.com/keycloak-requesting-token-with-password-grant/
+
+==== Endpoints
 Keycloak allows the user to interact with the system from an OpenID connection which is based on REST, you can see a list of the different endpoints here:
 https://localhost:<CONSOLE_PORT>/auth/realms/<REALM_NAME>/.well-known/openid-configuration
 https://stackoverflow.com/questions/46470477/how-to-get-keycloak-users-via-rest-without-admin-account/46558530#46558530
 
-***
-https://github.com/keycloak/keycloak-documentation/blob/master/securing_apps/topics/oidc/oidc-generic.adoc
-https://openid.net/specs/openid-connect-core-1_0.html#UserInfo
-https://www.keycloak.org/docs-api/5.0/rest-api/index.html#_users_resource
-https://stackoverflow.com/questions/55535440/how-to-get-users-from-keycloak-rest-api/55539390
-
-***
-
 In our application it would be:
 https://localhost:8543/auth/realms/trikorasolutions/.well-known/openid-configuration
+
+==== Similar Keycloaks open projects
+https://github.com/keycloak/keycloak/tree/master/testsuite/integration-arquillian/tests/base/src/test/java/org/keycloak/testsuite/admin
 
 == Troubleshooting
 
