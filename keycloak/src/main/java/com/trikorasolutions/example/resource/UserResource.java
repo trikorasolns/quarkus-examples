@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+
 @ApplicationScoped
 @Path("/api/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,6 +38,14 @@ public class UserResource {
   public Uni<RestResponse<UserDto>>  getUserInfo() {
     return Uni.createFrom().item(RestResponse.ResponseBuilder.ok(
       UserLogic.load(this.keycloakSecurityContext, this.jwt)).build());
+  }
+
+  @GET
+  @Path("/tenant")
+  @NoCache
+  public Uni<RestResponse<String>>  getUserTenant() {
+    return Uni.createFrom().item(RestResponse.ResponseBuilder.ok(
+      this.jwt.getClaim("tkr_tenant").toString()).build());
   }
 
   @GET

@@ -73,4 +73,5 @@ public class UserLogic {
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
       "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID).onItem().transform(jsonObject -> this.from(jsonObject));
   }
+
 }

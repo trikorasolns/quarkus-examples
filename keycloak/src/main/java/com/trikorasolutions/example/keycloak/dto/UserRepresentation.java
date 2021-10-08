@@ -1,11 +1,14 @@
 package com.trikorasolutions.example.keycloak.dto;
 
-import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import java.util.Set;
-import java.util.TreeSet;
+
 
 public class UserRepresentation {
+  /**
+   * In this first version of the example, the credential of the users are
+   * their usernames. This feature will be enhanced in future releases.
+   */
   public class UserDtoCredential {
     @JsonbProperty("type")
     public String type;
@@ -16,13 +19,11 @@ public class UserRepresentation {
     @JsonbProperty("temporary")
     public Boolean temporary;
 
-    @JsonbCreator
-    public UserDtoCredential(@JsonbProperty("value") String name){
+    public UserDtoCredential(String name){
       this.value = name;
       this.type = "password";
       this.temporary = false;
     }
-
   }
 
   @JsonbProperty("firstName")
@@ -43,13 +44,7 @@ public class UserRepresentation {
   @JsonbProperty("credentials")
   public Set<UserDtoCredential> credentials;
 
-  @JsonbCreator
-  public UserRepresentation(@JsonbProperty("firstName")String firstName,
-                            @JsonbProperty("lastName") String lastName,
-                            @JsonbProperty("email") String email,
-                            @JsonbProperty("enabled") Boolean enabled,
-                            @JsonbProperty("username") String username) {
-
+  public UserRepresentation(String firstName, String lastName, String email, Boolean enabled, String username) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -58,7 +53,6 @@ public class UserRepresentation {
     this.credentials = Set.of(this.new UserDtoCredential(username));
   }
 
-  @JsonbCreator
   public UserRepresentation(UserRepresentation newUser) {
     this.firstName = newUser.firstName;
     this.lastName = newUser.lastName;

@@ -51,4 +51,5 @@ public class UserResourceTest {
           "userPermissions[0].size()", Matchers.is(2));
 
   }
+
 }

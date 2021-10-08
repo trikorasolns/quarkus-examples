@@ -1,8 +1,6 @@
 package com.trikorasolutions.example.dto;
 
 import io.quarkus.security.credential.Credential;
-
-import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import java.util.Collection;
 import java.util.Set;
@@ -46,17 +44,13 @@ public class UserDto {
   @JsonbProperty("enabled")
   public Boolean enabled;
 
-  public UserDto() {
-  }
+  public UserDto() {}
 
-  @JsonbCreator
-  public UserDto(@JsonbProperty("userName") String name) {
+  public UserDto(String name) {
     this.userName = name;
   }
 
-  @JsonbCreator
-  public UserDto(@JsonbProperty("givenName") String givenName, @JsonbProperty("familyName") String familyName, @JsonbProperty("email") String email, @JsonbProperty("enabled") Boolean enabled, @JsonbProperty("userName") String userName) {
-
+  public UserDto(String givenName, String familyName, String email, Boolean enabled, String userName) {
     this.givenName = givenName;
     this.familyName = familyName;
     this.email = email;
