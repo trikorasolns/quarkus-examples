@@ -1,6 +1,6 @@
-package com.trikorasolutions.example.keycloak.clientresource;
+package com.trikorasolutions.example.keycloak.client.clientresource;
 
-import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
+import com.trikorasolutions.example.keycloak.client.dto.UserRepresentation;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
@@ -46,5 +46,19 @@ public interface KeycloakAuthAdminResource {
   Uni<JsonArray> deleteUser(@HeaderParam("Authorization") String bearerToken,
                              @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
                              @QueryParam("client_id") String clientId, @PathParam("id") String id);
+
+  @GET
+  @Path("/realms/{realm}/groups")
+  @Produces("application/json")
+  Uni<JsonArray> getGroupInfo(@HeaderParam("Authorization") String bearerToken,
+                             @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                             @QueryParam("client_id") String clientId, @QueryParam("search") String groupName);
+
+  @GET
+  @Path("/{realm}/groups/{id}/members")
+  @Produces("application/json")
+  Uni<JsonArray> getGroupUsers(@HeaderParam("Authorization") String bearerToken,
+                              @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                              @QueryParam("client_id") String clientId, @PathParam("id") String id);
 
 }

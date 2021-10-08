@@ -1,8 +1,8 @@
 package com.trikorasolutions.example.bl;
 
 import com.trikorasolutions.example.dto.UserDto;
-import com.trikorasolutions.example.keycloak.clientresource.KeycloakAuthorizationResource;
-import com.trikorasolutions.example.keycloak.dto.UserRepresentation;
+import com.trikorasolutions.example.keycloak.client.clientresource.KeycloakAuthorizationResource;
+import com.trikorasolutions.example.keycloak.client.dto.UserRepresentation;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -58,6 +58,11 @@ public class UserLogic {
   public static UserDto from(JsonObject from) {
     // Cannot reuse code since keycloak response fields have different keys between
     // admin and user endpoints
+    LOGGER.info("LLEGO A FROM{}",from);
+
+    LOGGER.info("LLEGO A puedo hacerlo{}",new UserDto(from.getString("given_name"),from.getString("family_name"),
+      from.getString("email"),true, from.getString("preferred_username")));
+
     return new UserDto(from.getString("given_name"),from.getString("family_name"),
       from.getString("email"),true, from.getString("preferred_username"));
   }

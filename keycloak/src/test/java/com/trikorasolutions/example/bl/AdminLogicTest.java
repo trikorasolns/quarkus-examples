@@ -102,4 +102,24 @@ public class AdminLogicTest {
     ;
 
   }
+
+  @Test
+  public void testGroupInfo() {
+    RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .get("/api/admin/trikorasolutions/groups/tenant-tenant1").then().statusCode(OK.getStatusCode())
+      .body("$.size()", Matchers.is(1),
+        "id.chars", Matchers.hasItem("a674d8a1-8a4d-42d5-976d-ba9c74d29433"),
+        "name.chars", Matchers.hasItem("tenant-tenant1")
+      );
+
+
+    LOGGER.info("ccccccccccccccccccccccccc:{}",RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .get("/api/admin/trikorasolutions/groups/tenant-tenant1/listUsers").then().extract().response().prettyPrint());
+
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .get("/api/admin/trikorasolutions/groups/tenant-tenant1/listUsers").then().statusCode(OK.getStatusCode())
+      .body( Matchers.is(1)
+      );
+  }
 }

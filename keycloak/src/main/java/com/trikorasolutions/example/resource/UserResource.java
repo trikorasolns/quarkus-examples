@@ -55,6 +55,7 @@ public class UserResource {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#listUsers: realm name{}", realm);
     }
+
     return user.keycloakUserInfo(realm,keycloakSecurityContext)
       .onItem().transform(userInfo->RestResponse.ResponseBuilder.ok(userInfo).build());
   }

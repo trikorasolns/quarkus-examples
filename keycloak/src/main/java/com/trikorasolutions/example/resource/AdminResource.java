@@ -16,6 +16,10 @@ import javax.json.JsonArray;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static javax.ws.rs.core.Response.Status.CONFLICT;
 
 @ApplicationScoped
@@ -120,4 +124,50 @@ public class AdminResource {
         ;
 
     }
+
+  @GET
+  @Path("/{realm}/groups/{group}")
+  @NoCache
+  public Uni<RestResponse<JsonArray>> getGroupInfo(@PathParam("realm") String realm, @PathParam("group") String group) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#getGroupInfo: {}", group);
+    }
+    return userAdminLogic.getGroupInfo(realm, keycloakSecurityContext, group).onItem()
+      .transform(groupArray -> {
+        if (groupArray == null) {
+          return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, JsonArray.EMPTY_JSON_ARRAY ).build();
+        } else {
+          return RestResponse.ResponseBuilder.ok(groupArray).build();
+        }})
+      .onFailure().recoverWithItem(
+        throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonArray.EMPTY_JSON_ARRAY).build());
+  }
+
+  @GET
+  @Path("/{realm}/groups/{group}/listUsers")
+  @NoCache
+  public Uni<RestResponse<List<UserDto>>> listGroupUsers(@PathParam("realm") String realm, @PathParam("group") String group) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#listGroupUsers: realm name{}-{}", realm, group);
+    }
+    List<UserDto> emptyUserDtoList = new ArrayList<>();
+
+  return  userAdminLogic.getGroupUsers(realm, keycloakSecurityContext,group).onItem()
+    .transform(userDtoList -> {
+      if (userDtoList == null) {
+        LOGGER.info("Es NULLLLLLLLLLLLLLL getGroupUsers");
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, emptyUserDtoList).build();
+      } else {
+        LOGGER.info("ES CORRECTO");
+        return RestResponse.ResponseBuilder.ok(userDtoList).build();
+      }})
+    .onFailure().recoverWithItem(
+      throwable ->{
+        LOGGER.info("ES FAIL{}",throwable);
+        LOGGER.info("ES FAIL{}",throwable.getMessage());
+        LOGGER.info("ES FAIL{}", Arrays.toString(throwable.getStackTrace()));
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, emptyUserDtoList).build();
+      });
+  }
+
   }

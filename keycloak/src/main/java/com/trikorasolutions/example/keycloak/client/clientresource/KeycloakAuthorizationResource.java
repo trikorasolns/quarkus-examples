@@ -1,4 +1,4 @@
-package com.trikorasolutions.example.keycloak.clientresource;
+package com.trikorasolutions.example.keycloak.client.clientresource;
 
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;

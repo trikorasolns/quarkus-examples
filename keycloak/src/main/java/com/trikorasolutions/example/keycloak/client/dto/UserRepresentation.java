@@ -1,4 +1,4 @@
-package com.trikorasolutions.example.keycloak.dto;
+package com.trikorasolutions.example.keycloak.client.dto;
 
 import javax.json.bind.annotation.JsonbProperty;
 import java.util.Set;
