@@ -74,4 +74,8 @@ public class UserLogic {
       "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID).onItem().transform(jsonObject -> this.from(jsonObject));
   }
 
+  public String getTenant(final JsonWebToken jwt, final String tenantName) {
+    return jwt.getClaim(tenantName).toString();
+  }
+
 }

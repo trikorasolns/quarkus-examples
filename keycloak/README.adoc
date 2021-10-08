@@ -21,7 +21,6 @@ firewall-cmd --add-port 8090/tcp --permanent
 firewall-cmd --add-port 8043/tcp --permanent
 ----
 
-
 === Create a podman for keyclock
 
 IMPORTANT: It is necessary to map two ports since one is needed for the keycloak console.

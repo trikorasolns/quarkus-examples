@@ -45,7 +45,7 @@ public class UserResource {
   @NoCache
   public Uni<RestResponse<String>>  getUserTenant() {
     return Uni.createFrom().item(RestResponse.ResponseBuilder.ok(
-      this.jwt.getClaim("tkr_tenant").toString()).build());
+      user.getTenant(this.jwt, "tkr_tenant")).build());
   }
 
   @GET
