@@ -3,7 +3,7 @@
 :toc: left
 :icons: font
 :source-highlighter: rouge
-:description: Example project for using Quarkus.
+:description: Keycloak example.
 :hardbreaks:
 
 == Set Up (version 15.0.2)
@@ -24,8 +24,7 @@ firewall-cmd --add-port 8043/tcp --permanent
 === Create a podman for keyclock
 
 IMPORTANT: It is necessary to map two ports since one is needed for the keycloak console.
-In our case, we map the 8090 with the 8080 because we are currently using the 8080
-in another project.
+In this case, you need to map the 8090 with the 8080 because Quarkus is currently using the 8080.
 
 [source,bash]
 ----
@@ -51,9 +50,9 @@ You need to be located in your project root directory in order to perform the fo
 mkdir /tmp/keycloak_tmp/
 cp src/test/resources/trikora-realm.json /tmp/keycloak_tmp/
 ----
-Then we can execute:
+Then you can execute:
 
-NOTE: In the current version of keycloak, it is not possible to run keycloak with an initial database, so we have to run the pod with an empty keycloak and then
+NOTE: In the current version of keycloak, it is not possible to run keycloak with an initial database, so you have to run the pod with an empty keycloak and then
 import the realm.json with the command line (see below). For that reason the flag `-e KEYCLOAK_IMPORT=/tmp/trikora-realm.json` has been removed from the run command.
 
 [source,bash]
@@ -65,37 +64,39 @@ podman run --name trikora_keycloak_quarkus_example --security-opt label=disable 
   quay.io/keycloak/keycloak:15.0.2
 ----
 
-NOTE: the --rm flag is set for deleting the pod after the execution. You can kill the process with `^C`.
+NOTE: the --rm flag is set for deleting the pod after the execution. You can kill the process with `^C`. Another option would be to launch the command with the -d
+flag instead of the --rm one. The -d option will launch the pod as a daemon.
 
-== Actions in the keycloak console
+=== Actions in the keycloak console
 
 * Link to keycloak console: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions
 
-=== Roles
-* We can access the roles section by the left navigator in the main page or clicking here:
+==== Roles
+* You can access the roles section by the left navigator in the main page or clicking here:
 https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions/roles
 
-* In this section we can add roles to our application that will be saved in the realms.json that we have located in the tmp directory.
+* In this section you can add roles to our application that will be saved in the realms.json that you have located in the tmp directory.
 
-=== User Management
+==== User Management
 
-* If the user section, we can edit all the information regarding the user such as the email, password ...
-but indeed we have the possibility of assigning new roles to the user as well as enroll them to different groups.
+* In the user section, you can edit all the information regarding the user such as the email, password ...
+but indeed you have the possibility of assigning new roles to the user as well as enroll them to different groups.
 
 
-== Security Management
+==== Security Management
 * In this section we will describe how keycloak filter the URLs with the proper permissions.
 
-* Firstly, we have to locate in Clients -> backend-service -> Authorization -> Settings -> Resources.
+* Firstly, you have to locate in Clients -> backend-service -> Authorization -> Settings -> Resources.
 Link: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions/clients/0ac5df91-e044-4051-bd03-106a3a5fb9cc/authz/resource-server/resource
 
-* Then, we have to create a new resource where we will establish the URLs that are going to be restricted. For doing so, there is a button `Create` in the upper-right side of the main layout.
+* Then, you have to create a new resource where you will establish the URLs that are going to be restricted. For doing so, there is a button `Create` in the upper-right side of the main layout.
 
-* After that, it is necessary to add an Associated Permission to the Resource, now we have to decide who is going to have access to the service by creating a new policy. A policy, may be a Role, Group, Client scope or even a single user. Once we have linked the policy to the resource, just the desired users could access to the services.
+* After that, it is necessary to add an Associated Permission to the Resource, now you have to decide who is going to have access to the service by creating a new policy. A policy, may be a Role, Group, Client scope or even a single user.
+Once you have linked the policy to the resource, just the desired users could access to the services.
 
 * If a user without the proper permissions tries to access the service, keycloak will return a http response with status 403 (FORBIDDEN).
 
-=== `How to give an Admin access to the real management endpoints`
+==== *How to give an Admin access to the real management endpoints*
 
 It is important to have at least one user with enough privileges to communicate with keycloak through the REST endpoints, in order to develop such a thing you
 can create a new group and then in the "role-mappings" section of the desired group, then click on "client-roles" after that select the "realm-management" client.
@@ -104,10 +105,10 @@ At this point, you should see the roles in the "Available Roles" window. Select 
 
 Lastly, do not forget to add the admin user to the group in the Users section of the keycloak console.
 
-== Backup and Restore
+=== Backup and Restore
 * As the keycloak admin console does not allow exporting users, we highly recommend using the command line solution in order to fully export your project.
 
-=== Export
+== Export
 * In this section we will describe how to export a realm.json in a single file from a running container using podman.
 
 [source,shell script]
@@ -135,7 +136,7 @@ podman exec -it trikora_keycloak_quarkus_example /opt/jboss/keycloak/bin/standal
  -Dkeycloak.migration.file=/tmp/trikora-realm.json
 ----
 
-=== Import
+== Import
 [source,bash]
 ----
  [podman | docker] exec -it <container_name> <PATH_TO_KEYCLOAK_IN_THE_POD>/bin/standalone.sh
@@ -150,7 +151,7 @@ podman exec -it trikora_keycloak_quarkus_example /opt/jboss/keycloak/bin/standal
  -Dkeycloak.migration.strategy=[OVERWRITE_EXISTING | IGNORE_EXISTING]
 ----
 IMPORTANT: When a realm is imported from the command line, the keycloak console is not updated due to a version bug. In order to see the imported realm, it is
-necessary to create another realm (empty, only need to enter the realm name). This action will force the console table to be updated, this is a keycloak bug so
+necessary to create another realm (empty, only need to enter the realm name). This action will force the console table to be updated, this is a keycloak bug, so
 we hope that it could be fixed in futures releases.
 
 [source,bash]
@@ -168,14 +169,21 @@ podman exec -it trikora_keycloak_quarkus_example /opt/jboss/keycloak/bin/standal
 ----
 
 == Import several files in a single realm
-* If we have stored the data of the project split in several files, we can merge it in a single project just by importing the files as they are a list separated by commas:
+* If you have stored the data of the project split in several files, you can merge it in a single project just by importing the files as they are a list separated by commas:
 -Dkeycloak.import=/tmp/realm1.json,/tmp/realm2.json
 
 WARNING: You cannot use the keycloak.import parameter with keycloak.migration.X parameters.
 If you use these parameters together, keycloak.import parameter will be ignored. The keycloak.import mechanism ignores the realms which already exist in the project.
 The keycloak.import mechanism is convenient for development purposes, but if more flexibility is needed, use the keycloak.migration.X parameters.
 
-== References
+=== Open id endpoints
+Keycloak allows the user to interact with the system from an OpenID connection which is based on REST, you can see a list of the different endpoints here:
+https://localhost:<CONSOLE_PORT>/auth/realms/<REALM_NAME>/.well-known/openid-configuration
+
+In our application it would be:
+https://localhost:8543/auth/realms/trikorasolutions/.well-known/openid-configuration
+
+=== References
 
 *Import and Export:*
 
@@ -187,20 +195,14 @@ The keycloak.import mechanism is convenient for development purposes, but if mor
 * https://www.keycloak.org/docs-api/9.0/rest-api/index.html#_client_registration_policy_resource
 * https://www.appsdeveloperblog.com/keycloak-requesting-token-with-password-grant/
 
-==== Endpoints
-Keycloak allows the user to interact with the system from an OpenID connection which is based on REST, you can see a list of the different endpoints here:
-https://localhost:<CONSOLE_PORT>/auth/realms/<REALM_NAME>/.well-known/openid-configuration
-https://stackoverflow.com/questions/46470477/how-to-get-keycloak-users-via-rest-without-admin-account/46558530#46558530
 
-In our application it would be:
-https://localhost:8543/auth/realms/trikorasolutions/.well-known/openid-configuration
+*Similar Keycloaks open projects:*
 
-==== Similar Keycloaks open projects
-https://github.com/keycloak/keycloak/tree/master/testsuite/integration-arquillian/tests/base/src/test/java/org/keycloak/testsuite/admin
+* https://github.com/keycloak/keycloak/tree/master/testsuite/integration-arquillian/tests/base/src/test/java/org/keycloak/testsuite/admin
 
-== Troubleshooting
+=== Troubleshooting
 
-=== Permission denied when running the pod
+==== Permission denied when running the pod
 
 *Problem*
 [source]
@@ -212,11 +214,11 @@ FATAL [org.keycloak.services] (ServerService Thread Pool -- 58) Error during sta
 The pod has not enough permissions for accessing the realm.json file.
 
 *Solution*
-When running the pod, we should add the `--security-opt label=disable` flag.
+When running the pod, you should add the `--security-opt label=disable` flag.
 
 :hardbreaks:
 
-=== Cannot import a realm when running the pod
+==== Cannot import a realm when running the pod
 *Problem*
 
 [source]
