@@ -118,4 +118,30 @@ public class AdminLogicTest {
         "userName",Matchers.hasItem("jdoe")
       );
   }
+
+  @Test
+  public void testPutUserInGroup() {
+    RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .put("/api/admin/trikorasolutions/users/mrsquare/groups/tenant-tenant1").then().statusCode(OK.getStatusCode())
+      .body( "userName",Matchers.is("mrsquare"));
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .get("/api/admin/trikorasolutions/groups/tenant-tenant1/listUsers").then().statusCode(OK.getStatusCode())
+      .body("$.size()", Matchers.greaterThanOrEqualTo(1),
+        "userName",Matchers.hasItem("mrsquare")
+      );
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .delete("/api/admin/trikorasolutions/users/mrsquare/groups/tenant-tenant1").then().statusCode(OK.getStatusCode())
+      .body( "userName",Matchers.is("mrsquare"));
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
+      .get("/api/admin/trikorasolutions/groups/tenant-tenant1/listUsers").then().statusCode(OK.getStatusCode())
+      .body("$.size()", Matchers.greaterThanOrEqualTo(1),
+        "userName",(Matchers.not(Matchers.hasItem("mrsquare")))
+      );
+  }
+
+
+
 }

@@ -61,4 +61,19 @@ public interface KeycloakAuthAdminResource {
                               @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
                               @QueryParam("client_id") String clientId, @PathParam("id") String id);
 
+  @PUT
+  @Path("/realms/{realm}/users/{id}/groups/{groupId}")
+  @Produces("application/json")
+  Uni<JsonArray> putUserInGroup(@HeaderParam("Authorization") String bearerToken,
+                               @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                               @QueryParam("client_id") String clientId, @PathParam("id") String id,
+                               @PathParam("groupId") String groupId);
+
+  @DELETE
+  @Path("/realms/{realm}/users/{id}/groups/{groupId}")
+  @Produces("application/json")
+  Uni<JsonArray> deleteUserFromGroup(@HeaderParam("Authorization") String bearerToken,
+                                @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,
+                                @QueryParam("client_id") String clientId, @PathParam("id") String id,
+                                @PathParam("groupId") String groupId);
 }

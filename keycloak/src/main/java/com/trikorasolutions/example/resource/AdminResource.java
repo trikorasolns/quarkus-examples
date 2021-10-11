@@ -1,6 +1,8 @@
 package com.trikorasolutions.example.resource;
 
+import com.trikorasolutions.example.bl.KeycloakInfo;
 import com.trikorasolutions.example.bl.UserAdminLogic;
+import com.trikorasolutions.example.bl.UserLogic;
 import com.trikorasolutions.example.dto.UserDto;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
@@ -43,9 +45,7 @@ public class AdminResource {
   @NoCache
   public Uni<RestResponse<String>> checkAccessAdm() {
     // This resource just check the access, so it can  return anything in the response
-    return Uni.createFrom()
-      .item(RestResponse.ResponseBuilder.ok(
-        this.keycloakSecurityContext.getPrincipal().getName() + "is accessing the service").build());
+    return Uni.createFrom().item(RestResponse.ResponseBuilder.ok(this.keycloakSecurityContext.getPrincipal().getName() + "is accessing the service").build());
   }
 
   @GET
@@ -82,11 +82,11 @@ public class AdminResource {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#updateUser username: {}", user.userName);
     }
+
     return userAdminLogic.nameToId(realm, keycloakSecurityContext, user.userName).onItem()
       .call(userid -> userAdminLogic.updateUser(realm, keycloakSecurityContext, userid, user))
-      .replaceWith(userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user.userName))
-      .onItem().transform(userDto->RestResponse.ResponseBuilder.ok(userDto).build())
-      .onFailure().recoverWithItem(
+      .replaceWith(userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user.userName)).onItem()
+      .transform(userDto -> RestResponse.ResponseBuilder.ok(userDto).build()).onFailure().recoverWithItem(
         throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build());
   }
 
@@ -97,33 +97,28 @@ public class AdminResource {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("#getUserInfo: {}", user);
     }
-    return userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user).onItem()
-      .transform(userDto -> {
-        if (userDto == null) {
-          return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
-        } else {
-          return RestResponse.ResponseBuilder.ok(userDto).build();
-        }})
-      .onFailure().recoverWithItem(
-          throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build())
-        ;
+    return userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user).onItem().transform(userDto -> {
+      if (userDto == null) {
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
+      } else {
+        return RestResponse.ResponseBuilder.ok(userDto).build();
       }
+    }).onFailure().recoverWithItem(throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build());
+  }
 
-    @DELETE
-    @Path("/{realm}/users/{user}")
-    @NoCache
-    public Uni<RestResponse<Void>>  deleteUser (@PathParam("realm") String realm, @PathParam("user") String user){
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.info("#deleteUser: {} with ID: {}", user, userAdminLogic.nameToId(realm, keycloakSecurityContext, user));
-      }
-      return userAdminLogic.nameToId(realm, keycloakSecurityContext, user).onItem()
-        .call(userid -> userAdminLogic.deleteUser(realm, keycloakSecurityContext, userid)).onItem()
-        .transform(userDto -> RestResponse.ResponseBuilder.ok().build())
-        .onFailure().recoverWithItem(
-          throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND).build())
-        ;
-
+  @DELETE
+  @Path("/{realm}/users/{user}")
+  @NoCache
+  public Uni<RestResponse<Void>> deleteUser(@PathParam("realm") String realm, @PathParam("user") String user) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.info("#deleteUser: {} with ID: {}", user, userAdminLogic.nameToId(realm, keycloakSecurityContext, user));
     }
+    return userAdminLogic.nameToId(realm, keycloakSecurityContext, user).onItem()
+      .call(userid -> userAdminLogic.deleteUser(realm, keycloakSecurityContext, userid)).onItem()
+      .transform(userDto -> RestResponse.ResponseBuilder.ok().build()).onFailure()
+      .recoverWithItem(throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND).build());
+
+  }
 
   @GET
   @Path("/{realm}/groups/{group}")
@@ -132,15 +127,14 @@ public class AdminResource {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#getGroupInfo: {}", group);
     }
-    return userAdminLogic.getGroupInfo(realm, keycloakSecurityContext, group).onItem()
-      .transform(groupArray -> {
-        if (groupArray == null) {
-          return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, JsonArray.EMPTY_JSON_ARRAY ).build();
-        } else {
-          return RestResponse.ResponseBuilder.ok(groupArray).build();
-        }})
-      .onFailure().recoverWithItem(
-        throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonArray.EMPTY_JSON_ARRAY).build());
+    return userAdminLogic.getGroupInfo(realm, keycloakSecurityContext, group).onItem().transform(groupArray -> {
+      if (groupArray == null) {
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, JsonArray.EMPTY_JSON_ARRAY).build();
+      } else {
+        return RestResponse.ResponseBuilder.ok(groupArray).build();
+      }
+    }).onFailure().recoverWithItem(
+      throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonArray.EMPTY_JSON_ARRAY).build());
   }
 
   @GET
@@ -152,19 +146,50 @@ public class AdminResource {
     }
     List<UserDto> emptyUserDtoList = new ArrayList<>();
 
-  return  userAdminLogic.getGroupUsers(realm, keycloakSecurityContext,group).onItem()
-    .transform(userDtoList -> {
+    return userAdminLogic.getGroupUsers(realm, keycloakSecurityContext, group).onItem().transform(userDtoList -> {
       if (userDtoList == null) {
         return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, emptyUserDtoList).build();
       } else {
         return RestResponse.ResponseBuilder.ok(userDtoList).build();
       }
-    })
-    .onFailure().recoverWithItem(
-      throwable ->{
-        LOGGER.debug("ES FAIL{}",throwable.getMessage());
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, emptyUserDtoList).build();
-      });
+    }).onFailure().recoverWithItem(throwable -> {
+      LOGGER.debug("ES FAIL{}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, emptyUserDtoList).build();
+    });
   }
 
+  @PUT
+  @Path("/{realm}/users/{user}/groups/{group}")
+  @NoCache
+  public Uni<RestResponse<UserDto>> putUserInGroup(@PathParam("realm") String realm, @PathParam("user") String user,
+                                                   @PathParam("group") String group) {
+    return userAdminLogic.putUserInGroup(realm, keycloakSecurityContext, user, group).onItem().transform(userDto -> {
+      if (userDto == null) {
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
+      } else {
+        return RestResponse.ResponseBuilder.ok(userDto).build();
+      }
+    }).onFailure().recoverWithItem(throwable -> {
+      LOGGER.debug("ES FAIL{}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
+    });
   }
+
+  @DELETE
+  @Path("/{realm}/users/{user}/groups/{group}")
+  @NoCache
+  public Uni<RestResponse<UserDto>> deleteUserFromGroup(@PathParam("realm") String realm, @PathParam("user") String user,
+                                                   @PathParam("group") String group) {
+    return userAdminLogic.deleteUserFromGroup(realm, keycloakSecurityContext, user, group).onItem().transform(userDto -> {
+      if (userDto == null) {
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
+      } else {
+        return RestResponse.ResponseBuilder.ok(userDto).build();
+      }
+    }).onFailure().recoverWithItem(throwable -> {
+      LOGGER.debug("ES FAIL{}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
+    });
+  }
+
+}
