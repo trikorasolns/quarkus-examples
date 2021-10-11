@@ -155,17 +155,14 @@ public class AdminResource {
   return  userAdminLogic.getGroupUsers(realm, keycloakSecurityContext,group).onItem()
     .transform(userDtoList -> {
       if (userDtoList == null) {
-        LOGGER.info("Es NULLLLLLLLLLLLLLL getGroupUsers");
         return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, emptyUserDtoList).build();
       } else {
-        LOGGER.info("ES CORRECTO");
         return RestResponse.ResponseBuilder.ok(userDtoList).build();
-      }})
+      }
+    })
     .onFailure().recoverWithItem(
       throwable ->{
-        LOGGER.info("ES FAIL{}",throwable);
-        LOGGER.info("ES FAIL{}",throwable.getMessage());
-        LOGGER.info("ES FAIL{}", Arrays.toString(throwable.getStackTrace()));
+        LOGGER.debug("ES FAIL{}",throwable.getMessage());
         return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, emptyUserDtoList).build();
       });
   }

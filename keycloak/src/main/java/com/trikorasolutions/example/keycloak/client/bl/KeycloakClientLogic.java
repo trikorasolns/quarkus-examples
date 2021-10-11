@@ -23,12 +23,8 @@ public class KeycloakClientLogic {
   KeycloakAuthAdminResource keycloakClient;
 
   public Uni<JsonArray> getUsersForGroup(String realm, SecurityIdentity keycloakSecurityContext, final String keycloakClientId, final String groupId) {
-    LOGGER.info("LLEGO A LOGICA DEL CLIENTE :{}", groupId);
-
-
     return keycloakClient.getGroupUsers(
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
       "implicit", keycloakClientId, groupId);
   }
-
 }

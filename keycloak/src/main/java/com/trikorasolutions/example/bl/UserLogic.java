@@ -45,6 +45,7 @@ public class UserLogic {
   public static UserDto from(JsonArray from) {
     // We only parse one user, so it must be stored in position with index 0
     JsonObject toParse;
+
     try {
        toParse = from.getJsonObject(0);
     }catch (IndexOutOfBoundsException e){
@@ -58,13 +59,14 @@ public class UserLogic {
   public static UserDto from(JsonObject from) {
     // Cannot reuse code since keycloak response fields have different keys between
     // admin and user endpoints
-    LOGGER.info("LLEGO A FROM{}",from);
 
-    LOGGER.info("LLEGO A puedo hacerlo{}",new UserDto(from.getString("given_name"),from.getString("family_name"),
-      from.getString("email"),true, from.getString("preferred_username")));
-
-    return new UserDto(from.getString("given_name"),from.getString("family_name"),
-      from.getString("email"),true, from.getString("preferred_username"));
+    if (from.containsKey("given_name")){
+      return new UserDto(from.getString("given_name"),from.getString("family_name"),
+        from.getString("email"),true, from.getString("preferred_username"));
+    }else{
+      return new UserDto(from.getString("firstName"),from.getString("lastName"),
+        from.getString("email"),from.getBoolean("enabled"), from.getString("username"));
+    }
   }
 
   /**

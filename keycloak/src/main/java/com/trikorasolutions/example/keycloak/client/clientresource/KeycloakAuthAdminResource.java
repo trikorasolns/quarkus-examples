@@ -55,7 +55,7 @@ public interface KeycloakAuthAdminResource {
                              @QueryParam("client_id") String clientId, @QueryParam("search") String groupName);
 
   @GET
-  @Path("/{realm}/groups/{id}/members")
+  @Path("/realms/{realm}/groups/{id}/members")
   @Produces("application/json")
   Uni<JsonArray> getGroupUsers(@HeaderParam("Authorization") String bearerToken,
                               @PathParam("realm") String realm, @QueryParam("grant_type") String grantType,

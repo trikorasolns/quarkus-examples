@@ -112,14 +112,10 @@ public class AdminLogicTest {
         "name.chars", Matchers.hasItem("tenant-tenant1")
       );
 
-
-    LOGGER.info("ccccccccccccccccccccccccc:{}",RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
-      .get("/api/admin/trikorasolutions/groups/tenant-tenant1/listUsers").then().extract().response().prettyPrint());
-
-
     RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
       .get("/api/admin/trikorasolutions/groups/tenant-tenant1/listUsers").then().statusCode(OK.getStatusCode())
-      .body( Matchers.is(1)
+      .body("$.size()", Matchers.greaterThanOrEqualTo(1),
+        "userName",Matchers.hasItem("jdoe")
       );
   }
 }

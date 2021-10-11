@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.json.JsonValue;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,15 +84,15 @@ public class UserAdminLogic {
   }
 
   /**
+   * Return a list of users in our DTO format, containing the user of a certain group
+   *
    * @param realm
    * @param keycloakSecurityContext
    * @param group
    * @return List of users.
    */
   public Uni<List<UserDto>> getGroupUsers(final String realm, final SecurityIdentity keycloakSecurityContext, final String group) {
-    LOGGER.info("ENTRO EN LOGIC");
     return this.groupNameToId(realm, keycloakSecurityContext, group)
-      .onItem().invoke(x->LOGGER.info("pinto id :{}",x))
       .onItem()
       .transformToUni(groupId -> keycloakClientBl.getUsersForGroup(realm, keycloakSecurityContext,KeycloakInfo.KEYCLOAK_CLIENT_ID, groupId))
       .onItem()
