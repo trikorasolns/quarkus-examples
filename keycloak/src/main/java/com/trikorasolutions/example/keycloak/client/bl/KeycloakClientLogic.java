@@ -19,6 +19,14 @@ public class KeycloakClientLogic {
   @RestClient
   KeycloakAuthAdminResource keycloakClient;
 
+  /**
+   * Creates a new user in the Keycloak database.
+   * @param realm the realm name in which the users are going to be queried.
+   * @param keycloakSecurityContext keycloakSecurityContext obtained by the session.
+   * @param keycloakClientId id of the client (service name).
+   * @param newUser a UserRepresentation of the user that is going to be created.
+   * @return A JsonArray with the UserRepresentation of the created user.
+   */
   public Uni<JsonArray> createUser(final String realm, final SecurityIdentity keycloakSecurityContext, final String keycloakClientId, final UserRepresentation newUser) {
     return keycloakClient.createUser(
         "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,

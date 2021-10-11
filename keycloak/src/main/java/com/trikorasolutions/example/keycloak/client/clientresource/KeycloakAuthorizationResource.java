@@ -11,14 +11,14 @@ import javax.ws.rs.*;
 public interface KeycloakAuthorizationResource {
 
   /**
-   * This method only returns personal information about the user, it does not provide
+   * This method only returns personal information about the user, it does not provide.
    * any information regarding the status of the user in the keycloak application.
-   * @param bearerToken access token provided by the  keycloak's SecurityIdentity
-   * @param realm the realm name in which the users are going to be queried
-   * @param grantType kind of authentication method
-   * @param clientId id of the client (service name)
+   * @param bearerToken access token provided by the  keycloak's SecurityIdentity.
+   * @param realm the realm name in which the users are going to be queried.
+   * @param grantType kind of authentication method.
+   * @param clientId id of the client (service name).
    *
-   * @return a JsonObject inside a Uni wrapper with the user's information
+   * @return a JsonObject inside a Uni wrapper with the user's information.
    */
   @GET
   @Path("/{realm}/protocol/openid-connect/userinfo")
