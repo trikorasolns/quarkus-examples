@@ -3,6 +3,7 @@ package com.trikorasolutions.example.resource;
 import com.trikorasolutions.example.Startup;
 import com.trikorasolutions.example.logic.FruitLogic;
 import com.trikorasolutions.example.model.Fruit;
+import com.trikorasolutions.example.model.Tree;
 import com.trikorasolutions.example.repo.FruitRepository;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Uni;
@@ -17,6 +18,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 
+import java.util.List;
+
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.CONFLICT;
 
@@ -25,7 +28,7 @@ import static org.jboss.resteasy.reactive.RestResponse.StatusCode.CONFLICT;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class FruitReactiveResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Startup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FruitReactiveResource.class);
 
   @Inject
   FruitRepository repoFruit;

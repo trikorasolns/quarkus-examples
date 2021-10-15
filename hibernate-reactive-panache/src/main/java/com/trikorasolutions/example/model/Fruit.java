@@ -3,12 +3,9 @@ package com.trikorasolutions.example.model;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-@Entity
+@Entity(name = "Fruit")
 @Table(name = "fruit")
 @ApplicationScoped
 public class Fruit extends PanacheEntityBase {
@@ -24,6 +21,9 @@ public class Fruit extends PanacheEntityBase {
 
   @Column(nullable = false)
   public Boolean ripen = false;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Tree tree;
 
   public Fruit() {
   }
@@ -67,6 +67,14 @@ public class Fruit extends PanacheEntityBase {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public void setTree(Tree tree) {
+    this.tree = tree;
+  }
+
+  public Tree getTree() {
+    return this.tree;
   }
 
 }

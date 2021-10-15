@@ -1,10 +1,14 @@
 package com.trikorasolutions.example.logic;
 
+import com.trikorasolutions.example.model.Fruit;
+import com.trikorasolutions.example.model.Tree;
 import com.trikorasolutions.example.repo.FruitRepository;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 @ApplicationScoped
 public class FruitLogic {
