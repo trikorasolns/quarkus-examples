@@ -102,7 +102,7 @@ public class FruitReactiveResourceTest {
     ;
   }
 
-  //@Test
+  @Test
   public void testLogic() {
     given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode());

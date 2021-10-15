@@ -28,7 +28,7 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
   /**
    * Update the fields of a fruit but preserving its id (name)
    *
-   * @param fruit Fruit that is going to be persisted in the DB.
+   * @param fruit Fruit with the updated fields that are going to be persisted in the DB.
    * @return A new updated instance of the Fruit that has been persisted in the DB.
    */
   @ReactiveTransactional
@@ -39,7 +39,7 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
       f.setDescription(fruit.description);
       f.setFamily(fruit.family);
       f.setRipen(fruit.ripen);
-      return f.persist();}
+      return this.persist(f);}
     );
   }
 
