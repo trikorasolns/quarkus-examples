@@ -13,10 +13,12 @@ dependencies {
   implementation 'io.quarkus:quarkus-arc'
   // KeyClock
   implementation 'io.quarkus:quarkus-keycloak-authorization'
+  implementation 'io.rest-assured:rest-assured'
 
   // Rest
   implementation 'io.quarkus:quarkus-resteasy-reactive'
   implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+  implementation 'io.quarkus:quarkus-rest-client-reactive-jackson'
   // Console
   implementation 'io.quarkus:quarkus-smallrye-health'
   implementation 'io.quarkus:quarkus-smallrye-graphql'
