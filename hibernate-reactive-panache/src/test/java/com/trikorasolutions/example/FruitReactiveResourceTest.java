@@ -82,10 +82,12 @@ public class FruitReactiveResourceTest {
 
   @Test
   public void testUpdate() {
+
+    LOGGER.info("EMPIEZA EL TEST");
     given().when()
       .body(new Fruit("pear", "Updated-Pear", "PearFam", true))
       .contentType(MediaType.APPLICATION_JSON)
-      .put("/fruitreact/update/pear").then().statusCode(OK.getStatusCode())
+      .put("/fruitreact/update").then().statusCode(OK.getStatusCode())
     ;
 
     given().when().get("/fruitreact/name/pear").then().statusCode(OK.getStatusCode())
@@ -96,7 +98,7 @@ public class FruitReactiveResourceTest {
     given().when()
       .body(new Fruit("Unknown", "Unknown", "Unknown", true))
       .contentType(MediaType.APPLICATION_JSON)
-      .put("/fruitreact/update/Unknown").then().statusCode(CONFLICT.getStatusCode())
+      .put("/fruitreact/update").then().statusCode(CONFLICT.getStatusCode())
     ;
   }
 

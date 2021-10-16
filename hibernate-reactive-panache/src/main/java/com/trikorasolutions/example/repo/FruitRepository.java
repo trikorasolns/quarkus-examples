@@ -4,12 +4,15 @@ import com.trikorasolutions.example.model.Fruit;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Uni;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
 public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FruitRepository.class);
 
   /**
    * Persist a Fruit in the DB.
@@ -25,16 +28,18 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
   /**
    * Update the fields of a fruit but preserving its id (name)
    *
-   * @param fruit Fruit that is going to be persisted in the DB.
+   * @param fruit Fruit with the updated fields that are going to be persisted in the DB.
    * @return A new updated instance of the Fruit that has been persisted in the DB.
    */
   @ReactiveTransactional
   public Uni<Fruit> change(Fruit fruit) {
+    LOGGER.info("REPO UPDATE{}", fruit);
+
     return this.findById(fruit.name).onItem().call(f->{
       f.setDescription(fruit.description);
       f.setFamily(fruit.family);
       f.setRipen(fruit.ripen);
-      return f.persist();}
+      return this.persist(f);}
     );
   }
 
