@@ -1,32 +1,38 @@
 package com.trikorasolutions.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import org.hibernate.Hibernate;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "Tree")
 @Table(name = "tree")
-@ApplicationScoped
 public class Tree extends PanacheEntityBase {
   @Id
   @Column(length = 50, unique = true)
   public String name;
 
-
   @OneToMany(
     mappedBy = "tree",
     cascade = CascadeType.ALL,
-    orphanRemoval = true
+    orphanRemoval = true,
+    fetch = FetchType.LAZY
   )
-//  @JoinColumn(name="tree_id")
   private List<Fruit> treeFruits;
 
   public void addFruit(Fruit fruit) {
     treeFruits.add(fruit);
     fruit.setTree(this);
+  }
+
+  public void addFruits(List<Fruit> fruits) {
+    treeFruits.addAll(fruits);
+    fruits.stream().forEach(fruit->fruit.setTree(this));
   }
 
   public void removeComment(Fruit fruit) {

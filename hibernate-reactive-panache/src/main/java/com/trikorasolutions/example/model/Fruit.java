@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity(name = "Fruit")
 @Table(name = "fruit")
-@ApplicationScoped
 public class Fruit extends PanacheEntityBase {
   @Id
   @Column(length = 50, unique = true)
