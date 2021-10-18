@@ -46,12 +46,13 @@ public class TreeLogic {
         List<Fruit> lst = new ArrayList<>();
         lst.addAll(tuple.getItem1());
         lst.addAll(tuple.getItem2());
+        lst.forEach(fruit -> fruit.setTree(tree.name));
 
         tree.setTreeFruits(lst);
         return tree.persist();
 
       }).onItem().transformToUni(tree -> repoTree.findById(((Tree) tree).name)).onItem()
-      .transformToUni(tree -> Mutiny.fetch(tree.getTreeFruits()).onItem().transform(fruits -> {
+      .transformToUni(tree -> repoFruit.findForTree(tree.name); Mutiny.fetch(tree.getTreeFruits()).onItem().transform(fruits -> {
         tree.setTreeFruits(fruits);
         return tree;
       })).onItem().transform(TreeDto::from);
