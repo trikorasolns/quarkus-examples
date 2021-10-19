@@ -1,5 +1,7 @@
 package com.trikorasolutions.example.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -22,6 +24,10 @@ public class Fruit {
   @Column(nullable = false)
   public Boolean ripen = false;
 
+  @ManyToOne //(fetch = FetchType.EAGER)
+  @JoinColumn(name = "tree_name", referencedColumnName = "name")
+  @JsonBackReference
+  private Tree owner;
 
   public Fruit() {
   }
@@ -74,4 +80,8 @@ public class Fruit {
   public void setRipen(Boolean ripen) {
     this.ripen = ripen;
   }
+
+  public Tree getOwner() { return owner;}
+
+  public void setOwner(Tree owner) { this.owner = owner;}
 }
