@@ -1,9 +1,10 @@
 package com.trikorasolutions.example.resource;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.trikorasolutions.example.dto.TreeDto;
 import com.trikorasolutions.example.logic.TreeLogic;
-import com.trikorasolutions.example.model.Tree;
 import com.trikorasolutions.example.repo.TreeRepository;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Uni;
@@ -18,15 +19,17 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.CONFLICT;
 
 @ApplicationScoped
 @Path("/tree")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TreeReactiveResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TreeReactiveResource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TreeReactiveResource.class);
 
   @Inject
   TreeRepository repoTree;
@@ -36,25 +39,38 @@ public class TreeReactiveResource {
 
   @POST
   @Path("/create")
-  public Uni<Response> create(final Tree tree) {
-    return repoTree.create(tree).onItem().transform(tree1 -> {
-      LOGGER.info("created tree: {}", tree1);
-      return Response.ok(tree1).build();
-    }).onFailure().recoverWithItem(ex -> {
-      LOGGER.info("ex: {}", ex);
-      return Response.ok().status(CONFLICT).build();
-    });
+  public Uni<RestResponse<TreeDto>> create(final TreeDto tree) {
+    LOGGER.info("#create(TreeDto)... {}", tree);
+    return logicTree.create(tree).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
+      .onFailure().recoverWithItem(ex -> {
+        LOGGER.error("ex: {}", ex);
+        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
+      });
   }
 
   @GET
   @Path("/name/{name}")
-  public Uni<Response> findByName(final @RestPath("name") String name) {
+  public Uni<RestResponse<TreeDto>> getTree(final @RestPath("name") String name) {
     return repoTree.findByName(name).onItem().transform(tree -> {
       LOGGER.info("fetched tree: {}", tree);
       if (tree != null) {
-          return Response.ok(TreeDto.from(tree)).build();
+        return RestResponse.ResponseBuilder.ok(tree).build();
       } else {
-          return Response.ok().status(NOT_FOUND).build();
+        return RestResponse.ResponseBuilder.create(NOT_FOUND, new TreeDto()).build();
+      }
+    });
+  }
+
+  @GET
+  @Path("getFull/name/{name}")
+  public Uni<RestResponse<TreeDto>> getFullTree(final @RestPath("name") String name) {
+    LOGGER.info("#getFullTree(String): {}", name);
+    return logicTree.getFullTree(name).onItem().transform(tree -> {
+      LOGGER.info("fetched tree: {}", tree);
+      if (tree != null) {
+        return RestResponse.ResponseBuilder.ok(tree).build();
+      } else {
+        return RestResponse.ResponseBuilder.create(NOT_FOUND, new TreeDto()).build();
       }
     });
   }
@@ -79,19 +95,34 @@ public class TreeReactiveResource {
     return repoTree.listAll().onItem().transform(tree -> Response.ok(tree).build());
   }
 
-
   @POST
-  @Path("/combine")
-  public Uni<RestResponse<TreeDto>> combine(final @RestPath  String family1, final @RestPath String family2) {
+  @Path("/combine1")
+  public Uni<RestResponse<TreeDto>> combine1(final @RestPath String family1) {
     //TODO: fix the rest path arguments
     LOGGER.info("#combined f1,f2 {}-{}", "Rutaceae", "Rosaceae");
 
-    return logicTree.findToCombine("Rutaceae","Rosaceae").onItem().transform(fruits -> {
+    return logicTree.addFruitsToTree(family1).onItem().transform(fruits -> {
       LOGGER.info("combined fruit: {}", fruits);
       return RestResponse.ResponseBuilder.ok(fruits).build();
 
     }).onFailure().recoverWithItem(thr -> {
-      LOGGER.info("Failure when calling findToCombine:{}",thr);
+      LOGGER.info("Failure when calling findToCombine:{}", thr);
+      return RestResponse.ResponseBuilder.create(Response.Status.NOT_ACCEPTABLE, new TreeDto()).build();
+    });
+  }
+
+  @POST
+  @Path("/combine2")
+  public Uni<RestResponse<TreeDto>> combine2(final @RestPath String family1, final @RestPath String family2) {
+    //TODO: fix the rest path arguments
+    LOGGER.info("#combined f1,f2 {}-{}", "Rutaceae", "Rosaceae");
+
+    return logicTree.findToCombine(family1, family2).onItem().transform(fruits -> {
+      LOGGER.info("combined fruit: {}", fruits);
+      return RestResponse.ResponseBuilder.ok(fruits).build();
+
+    }).onFailure().recoverWithItem(thr -> {
+      LOGGER.info("Failure when calling findToCombine:{}", thr);
       return RestResponse.ResponseBuilder.create(Response.Status.NOT_ACCEPTABLE, new TreeDto()).build();
     });
   }

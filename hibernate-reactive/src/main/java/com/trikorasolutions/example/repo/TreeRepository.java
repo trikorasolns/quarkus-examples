@@ -1,5 +1,6 @@
 package com.trikorasolutions.example.repo;
 
+import com.trikorasolutions.example.dto.TreeDto;
 import com.trikorasolutions.example.model.Fruit;
 import com.trikorasolutions.example.model.Tree;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
@@ -20,39 +21,20 @@ public class TreeRepository {
   @Inject
   Mutiny.SessionFactory sf;
 
-//  @ReactiveTransactional //V1
-//  public Uni<Tree> create(final Tree tree) {
-//    return sf.withTransaction((s, t) -> {s.persist(tree);
-//      Uni<Tree> perTree = Mutiny.fetch(tree);
-//      return perTree.onItem().invoke(pt->Hibernate.initialize(pt.getTreeFruits())).replaceWith(perTree);
-//    });
-//  }
+  public Uni<Tree> enrichTree(String treeName) {
+    return sf.withTransaction((s, t) -> s.find(Tree.class, treeName)).chain(fTree-> Mutiny.fetch(fTree));
+  }
 
-//  @ReactiveTransactional V2
-//  public Uni<Tree> create(final Tree tree) {
-//    return sf.withTransaction((s, t) -> s.persist(tree).replaceWith(s.find(Tree.class, tree.name)));
-//  }
-//
-//  @ReactiveTransactional //V3
-//  public Uni<Tree> create(final Tree tree) {
-//    return sf.withTransaction((s, t) -> {s.persist(tree);
-//      Uni<Tree> perTree = Mutiny.fetch(tree);
-//      return perTree.onItem().invoke(pt->Hibernate.initialize(pt.getTreeFruits())).replaceWith(perTree);
-//    });
-//  }
   @ReactiveTransactional
   public Uni<Tree> create(Tree tree) {
-    return sf.withTransaction((s, t) -> {
-      //Hibernate.initialize(tree.getTreeFruits());
-      //s.persistAll(tree.getTreeFruits()); //Persist the fruits before the tree
-      return s.persist(tree);
-      })
+    LOGGER.info("#createInRepo{}: ",tree);
+    return sf.withTransaction((s, t) -> s.persist(tree))
       .replaceWith(sf.withTransaction((s, t) -> s.find(Tree.class, tree.name)));
   }
 
   @ReactiveTransactional
-  public Uni<Tree> findByName(String name) {
-    return sf.withTransaction((s, t) -> s.find(Tree.class, name));
+  public Uni<TreeDto> findByName(String name) {
+    return sf.withTransaction((s, t) -> s.find(Tree.class, name)).onItem().transform(TreeDto::from);
   }
 
   @ReactiveTransactional

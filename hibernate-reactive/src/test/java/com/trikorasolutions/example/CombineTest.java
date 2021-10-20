@@ -44,8 +44,7 @@ public class CombineTest {
   }
 
 
-
-  @Test
+//  @Test
   public void testCombine() {
     given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode());
@@ -53,32 +52,20 @@ public class CombineTest {
     given().when().body(new Fruit("pineapple", "Pineapple", "Rutaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode());
 
-//    LOGGER.info("RESPONSE COMBINE:{}",given()
-//      .param("family1","Rosaceae")
-//      .param("family2","Rutaceae")
-//      .when()
-//      .contentType(MediaType.APPLICATION_JSON)
-//      .post("/tree/combine")
-//      .then().statusCode(OK.getStatusCode())
-//      .extract().response().prettyPrint());
 
-        LOGGER.info("RESPONSE COMBINE:{}",given().when()
-      .param("family1","Rosaceae")
-      .param("family2","Rutaceae")
-          .contentType(MediaType.APPLICATION_JSON)
-      .post("/tree/combine")
-      .then().statusCode(OK.getStatusCode())
-      .extract().response().prettyPrint());
-
+    LOGGER.info("RESPONSE COMBINE:{}",
+      given().when().param("family1", "Rosaceae").contentType(MediaType.APPLICATION_JSON).post("/tree/combine1").then()
+        .statusCode(OK.getStatusCode()).extract().response().prettyPrint());
 
 //    given().when().get("/fruitreact/combine").then().statusCode(OK.getStatusCode());
     LOGGER.info("RESPONSE LIST FRUITS:{}",
-    given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode()).extract().response().prettyPrint());
+      given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode()).extract().response()
+        .prettyPrint());
 
     LOGGER.info("RESPONSE LIST TREE:{}",
-      given().when().get("/tree/name/combine_tree").then().statusCode(OK.getStatusCode()).extract().response().prettyPrint());
+      given().when().get("/tree/name/combine_tree").then().statusCode(OK.getStatusCode()).extract().response()
+        .prettyPrint());
   }
-
 
 
 }

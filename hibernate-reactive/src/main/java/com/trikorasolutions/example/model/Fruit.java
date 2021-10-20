@@ -1,6 +1,7 @@
 package com.trikorasolutions.example.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.*;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @NamedQuery(name = "Fruit.listAll", query = "SELECT f FROM Fruit f ORDER BY f.name")
 @NamedQuery(name = "Fruit.delete", query = "DELETE FROM Fruit f WHERE f.name = :name")
 @NamedQuery(name = "Fruit.fetchFamily", query = "SELECT f FROM Fruit f WHERE f.family = :family")
+@NamedQuery(name = "Fruit.fetchByTree", query = "SELECT f FROM Fruit f WHERE f.tree = :tree")
 public class Fruit {
 
   @Id
@@ -24,10 +26,12 @@ public class Fruit {
   @Column(nullable = false)
   public Boolean ripen = false;
 
-  @ManyToOne //(fetch = FetchType.EAGER)
-  @JoinColumn(name = "tree_name", referencedColumnName = "name")
-  @JsonBackReference
-  private Tree owner;
+  @Column(length = 50)
+  public String tree;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinFormula("(SELECT t.name FROM tree t WHERE t.name = tree LIMIT 1)")
+  private Tree ownerTree;
 
   public Fruit() {
   }
@@ -42,6 +46,14 @@ public class Fruit {
     this.description = description;
     this.family = family;
     this.ripen = isRipen;
+  }
+
+  public Fruit(String name, String description, String family, Boolean isRipen, final String tree) {
+    this.name = name;
+    this.description = description;
+    this.family = family;
+    this.ripen = isRipen;
+    this.tree = tree;
   }
 
   @Override
@@ -81,7 +93,7 @@ public class Fruit {
     this.ripen = ripen;
   }
 
-  public Tree getOwner() { return owner;}
+  public Tree getOwnerTree() { return ownerTree;}
 
-  public void setOwner(Tree owner) { this.owner = owner;}
+  public void setOwnerTree(Tree ownerTree) { this.ownerTree = ownerTree;}
 }
