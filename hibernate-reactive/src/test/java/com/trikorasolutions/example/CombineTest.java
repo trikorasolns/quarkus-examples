@@ -23,17 +23,8 @@ public class CombineTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CombineTest.class);
 
-  @Inject
-  Mutiny.SessionFactory sf;
-
-  @BeforeEach
-  public void initDatabase() {
-    RestAssured.defaultParser = Parser.JSON;
-    LOGGER.warn("delete from database");
-    Integer res = sf.withTransaction((s, t) -> s.createQuery("DELETE FROM Fruit").executeUpdate()).await()
-      .atMost(Duration.ofSeconds(30));
-    LOGGER.warn("{} records removed", res);
-
+  @Test
+  public void testCombine() {
     given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
       .body("name", containsString("pear"), "description", containsString("Pear"));
@@ -41,11 +32,7 @@ public class CombineTest {
     given().when().body(new Fruit("apple", "Apple", "Rosaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
       .body("name", containsString("apple"), "description", containsString("Apple"));
-  }
 
-
-//  @Test
-  public void testCombine() {
     given().when().body(new Fruit("lemon", "Lemon", "Rutaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode());
 
@@ -53,18 +40,18 @@ public class CombineTest {
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode());
 
 
-    LOGGER.info("RESPONSE COMBINE:{}",
-      given().when().param("family1", "Rosaceae").contentType(MediaType.APPLICATION_JSON).post("/tree/combine1").then()
+    LOGGER.warn("RESPONSE COMBINE:{}",
+      given().when()/*.param("family1", "Rosaceae")*/.contentType(MediaType.APPLICATION_JSON).get("/tree/combine1/Rosaceae").then()
         .statusCode(OK.getStatusCode()).extract().response().prettyPrint());
 
 //    given().when().get("/fruitreact/combine").then().statusCode(OK.getStatusCode());
-    LOGGER.info("RESPONSE LIST FRUITS:{}",
-      given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode()).extract().response()
-        .prettyPrint());
-
-    LOGGER.info("RESPONSE LIST TREE:{}",
-      given().when().get("/tree/name/combine_tree").then().statusCode(OK.getStatusCode()).extract().response()
-        .prettyPrint());
+//    LOGGER.info("RESPONSE LIST FRUITS:{}",
+//      given().when().get("/fruitreact/listAll").then().statusCode(OK.getStatusCode()).extract().response()
+//        .prettyPrint());
+//
+//    LOGGER.info("RESPONSE LIST TREE:{}",
+//      given().when().get("/tree/name/combine_tree").then().statusCode(OK.getStatusCode()).extract().response()
+//        .prettyPrint());
   }
 
 

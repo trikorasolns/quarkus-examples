@@ -21,10 +21,6 @@ public class TreeRepository {
   @Inject
   Mutiny.SessionFactory sf;
 
-  public Uni<Tree> enrichTree(String treeName) {
-    return sf.withTransaction((s, t) -> s.find(Tree.class, treeName)).chain(fTree-> Mutiny.fetch(fTree));
-  }
-
   @ReactiveTransactional
   public Uni<Tree> create(Tree tree) {
     LOGGER.info("#createInRepo{}: ",tree);

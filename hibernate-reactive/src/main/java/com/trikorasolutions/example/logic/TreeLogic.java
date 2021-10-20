@@ -40,11 +40,10 @@ public class TreeLogic {
 
   @ReactiveTransactional
   public Uni<TreeDto> addFruitsToTree(String family1) {
-    LOGGER.info("#findToCombine(logic) f1:{}, f2{}", family1);
+    LOGGER.info("#findToCombine(logic) f1:{}", family1);
 
     // Gets the families in two gets using the NamedQueries
     Uni<List<Fruit>> listF1 = repoFruit.findByFamily(family1);
-
     // Put all the fruits in a new the tree
     return listF1.onItem().transformToUni(fruits -> {
       Tree tree = new Tree("combine_tree");

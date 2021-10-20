@@ -95,11 +95,10 @@ public class TreeReactiveResource {
     return repoTree.listAll().onItem().transform(tree -> Response.ok(tree).build());
   }
 
-  @POST
-  @Path("/combine1")
+  @GET
+  @Path("/combine1/{family1}")
   public Uni<RestResponse<TreeDto>> combine1(final @RestPath String family1) {
-    //TODO: fix the rest path arguments
-    LOGGER.info("#combined f1,f2 {}-{}", "Rutaceae", "Rosaceae");
+    LOGGER.info("#combine1 f1 {}", family1 );
 
     return logicTree.addFruitsToTree(family1).onItem().transform(fruits -> {
       LOGGER.info("combined fruit: {}", fruits);

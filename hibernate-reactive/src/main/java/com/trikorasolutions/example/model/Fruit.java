@@ -30,7 +30,8 @@ public class Fruit {
   public String tree;
 
   @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinFormula("(SELECT t.name FROM tree t WHERE t.name = tree LIMIT 1)")
+  //https://vladmihalcea.com/how-to-customize-an-entity-association-join-on-clause-with-hibernate-joinformula/
+  //@JoinFormula("(SELECT t.name FROM tree t WHERE t.name = tree LIMIT 1)")
   private Tree ownerTree;
 
   public Fruit() {
