@@ -38,10 +38,6 @@ public class TreeRepository {
     return sf.withSession(s -> s.createNamedQuery("Tree.listAll", Tree.class).getResultList());
   }
 
-  @ReactiveTransactional
-  public Uni<List<Tree>> findByFamily(String family) {
-    return sf.withSession(s -> s.createNamedQuery("Tree.fetchFamily", Tree.class).setParameter("family", family).getResultList());
-  }
 
   @ReactiveTransactional
   public Uni<Integer> delete(final String name) {

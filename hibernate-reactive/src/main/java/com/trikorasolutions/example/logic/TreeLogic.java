@@ -41,6 +41,18 @@ public class TreeLogic {
 
   }
 
+  public Uni<TreeDto> getFullTree(String treeName) {
+    LOGGER.info("#getFullTree(String){}: ", treeName);
+    TreeDto newTree = new TreeDto(treeName);
+
+    return sf.withTransaction(
+      (s, t) -> s.find(Tree.class, treeName)
+        .chain(fTree -> repoFruit.findByTree(fTree.name))
+        .onItem().transform(FruitDto::allFrom)
+        .invoke(dbTree -> newTree.setFruits(dbTree))
+        .replaceWith(newTree));
+  }
+
   @ReactiveTransactional
   public Uni<TreeDto> findToCombine(String family1, String family2) {
     LOGGER.info("#findToCombine(logic) f1:{}, f2{}", family1, family2);
@@ -65,17 +77,39 @@ public class TreeLogic {
     }).onItem().transformToUni(tree->getFullTree(tree.name));
   }
 
-  public Uni<TreeDto> getFullTree(String treeName) {
-    LOGGER.info("#getFullTree(String){}: ", treeName);
-    TreeDto newTree = new TreeDto(treeName);
+  @ReactiveTransactional
+  public Uni<TreeDto> persistAlreadyCreated(Tree tree, String family) {
+    LOGGER.info("#persistAlreadyCreated(logic) {}", tree.name);
+    Uni<List<Fruit>> listF1 = repoFruit.findByFamily(family);
 
-    return sf.withTransaction(
-      (s, t) -> s.find(Tree.class, treeName)
-        .chain(fTree -> repoFruit.findByTree(fTree.name))
-        .onItem().transform(FruitDto::allFrom)
-        .invoke(dbTree -> newTree.setFruits(dbTree))
-        .replaceWith(newTree));
+    return listF1.onItem().transformToUni(list -> {
+      tree.setTreeFruits(list);
+      return repoTree.create(tree); // Returns find tree
+
+    }).onItem().transformToUni(treeF->getFullTree(treeF.name));
+
   }
+
+  @ReactiveTransactional
+  public Uni<TreeDto> persistNoneCreated(TreeDto tree) {
+    LOGGER.info("#persistNoneCreated(logic) {}", tree.name);
+
+    // Insert the new tree and the new fruits just by persisting the tree
+    return repoTree.create(tree.toTree())
+      .onItem().transformToUni(treeF->getFullTree(treeF.name));
+  }
+
+//  @ReactiveTransactional
+//  public Uni<TreeDto> persistOnlyFruits(List<FruitDto> fruits, final String treeName) {
+//    LOGGER.info("#persistNoneCreated(logic) {}", tree.name);
+//
+//    // Insert the new tree and the new fruits just by persisting the tree
+//    return repoTree.create(tree.toTree())
+//      .onItem().transformToUni(treeF->getFullTree(treeF.name));
+//  }
+
+
+
 }
 
 

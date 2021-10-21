@@ -8,6 +8,7 @@ import java.util.List;
 @Table(name = "tree")
 @NamedQuery(name = "Tree.listAll", query = "SELECT t FROM Tree t ORDER BY t.name")
 @NamedQuery(name = "Tree.delete", query = "DELETE FROM Tree t WHERE t.name = :name")
+@NamedQuery(name = "Tree.byName", query = "SELECT t FROM Tree t WHERE t.name = :name")
 public class Tree {
 
   @Id
@@ -24,8 +25,11 @@ public class Tree {
   }
 
   public void addFruits(List<Fruit> fruits) {
-    treeFruits.addAll(fruits);
-    fruits.stream().forEach(f -> f.tree = this.name);
+    treeFruits = fruits;
+
+    if(fruits !=null) {
+      fruits.stream().forEach(f -> f.tree = this.name);
+    }
   }
 
   public Tree() {
@@ -37,7 +41,7 @@ public class Tree {
 
   public Tree(String name, List<Fruit> fruits) {
     this.name = name;
-    this.treeFruits = fruits;
+    this.addFruits(fruits);
   }
 
   public Tree(String name, Fruit f) {
@@ -61,7 +65,10 @@ public class Tree {
 
   public void setTreeFruits(List<Fruit> treeFruits) {
     this.treeFruits = treeFruits;
-    this.treeFruits.stream().forEach(f->f.tree = this.name);
+    if(this.treeFruits !=null ){
+      this.treeFruits.stream().forEach(f->f.tree = this.name);
+    }
+
   }
 
   public List<Fruit> getTreeFruits() {

@@ -3,8 +3,10 @@ package com.trikorasolutions.example.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.trikorasolutions.example.dto.FruitDto;
 import com.trikorasolutions.example.dto.TreeDto;
 import com.trikorasolutions.example.logic.TreeLogic;
+import com.trikorasolutions.example.model.Tree;
 import com.trikorasolutions.example.repo.TreeRepository;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Uni;
@@ -21,6 +23,7 @@ import javax.ws.rs.core.Response;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -95,7 +98,7 @@ public class TreeReactiveResource {
     return repoTree.listAll().onItem().transform(tree -> Response.ok(tree).build());
   }
 
-  
+
   @GET
   @Path("/combine2/{family1}/{family2}")
   public Uni<RestResponse<TreeDto>> combine2(final @RestPath String family1, final @RestPath String family2) {
@@ -110,5 +113,41 @@ public class TreeReactiveResource {
       return RestResponse.ResponseBuilder.create(Response.Status.NOT_ACCEPTABLE, new TreeDto()).build();
     });
   }
+
+  @POST
+  @Path("/persist/{family}")
+  public Uni<RestResponse<TreeDto>> persistAlreadyCreated(final Tree tree, @RestPath String family) {
+    LOGGER.info("#persistAlreadyCreated(String) {}", tree.name);
+
+    return logicTree.persistAlreadyCreated(tree, family).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
+      .onFailure().recoverWithItem(ex -> {
+        LOGGER.error("ex: {}", ex);
+        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
+      });
+  }
+
+  @POST
+  @Path("/persistall")
+  public Uni<RestResponse<TreeDto>> persistNoneCreated(final TreeDto tree) {
+    LOGGER.info("#persistAlreadyCreated(String) {}", tree.name);
+
+    return logicTree.persistNoneCreated(tree).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
+      .onFailure().recoverWithItem(ex -> {
+        LOGGER.error("ex: {}", ex);
+        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
+      });
+  }
+
+//  @POST
+//  @Path("/persistOnlyFruits/{treeName}")
+//  public Uni<RestResponse<TreeDto>> persistOnlyFruits(final List<FruitDto> fruitsInDto, @RestPath String treeName) {
+//    LOGGER.info("#persistNoneCreated(String) {}", treeName);
+//
+//    return logicTree.persistOnlyFruits(fruitsInDto,treeName ).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
+//      .onFailure().recoverWithItem(ex -> {
+//        LOGGER.error("ex: {}", ex);
+//        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
+//      });
+//  }
 
 }
