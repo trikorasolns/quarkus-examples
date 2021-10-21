@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.PostPersist;
+import javax.persistence.PrePersist;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,24 +38,7 @@ public class TreeLogic {
     return repoTree.create(tree.toTree())
       .onItem().transform(TreeDto::from)
       .replaceWith(this.getFullTree(tree.name));
-  }
 
-  @ReactiveTransactional
-  public Uni<TreeDto> addFruitsToTree(String family1) {
-    LOGGER.info("#findToCombine(logic) f1:{}", family1);
-
-    // Gets the families in two gets using the NamedQueries
-    Uni<List<Fruit>> listF1 = repoFruit.findByFamily(family1);
-    // Put all the fruits in a new the tree
-    return listF1.onItem().transformToUni(fruits -> {
-      Tree tree = new Tree("combine_tree");
-      tree.setTreeFruits(fruits);
-      return repoTree.create(tree); // Returns find tree
-    })/*.onItem().transformToUni( x-> Mutiny.fetch(x.getTreeFruits())
-        .onItem().transform(fruits -> {
-        x.setTreeFruits(fruits);
-        return x;
-      }))*/.onItem().transform(TreeDto::from);
   }
 
   @ReactiveTransactional
@@ -77,11 +62,7 @@ public class TreeLogic {
       tree.setTreeFruits(lst);
       return repoTree.create(tree); // Returns find tree
 
-    }).onItem().transformToUni(x -> Mutiny.fetch(x.getTreeFruits()).onItem().transform(fruits -> {
-      x.setTreeFruits(fruits);
-      return x;
-
-    })).onItem().transform(TreeDto::from);
+    }).onItem().transformToUni(tree->getFullTree(tree.name));
   }
 
   public Uni<TreeDto> getFullTree(String treeName) {

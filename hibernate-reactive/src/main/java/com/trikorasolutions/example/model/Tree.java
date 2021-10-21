@@ -11,20 +11,22 @@ import java.util.List;
 public class Tree {
 
   @Id
-  @Column(length = 50, unique = true)
+  @Column(length = 50, unique = true, name ="name")
   public String name;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "ownerTree", orphanRemoval = true)
+  //@OneToMany(cascade = {CascadeType.REFRESH,CascadeType.DETACH,CascadeType.MERGE,CascadeType.REMOVE}, mappedBy = "ownerTree", orphanRemoval = true, fetch = FetchType.LAZY)
+  @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "ownerTree", orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Fruit> treeFruits;
 
-//  public void addFruits(Fruit fruit) {
-//    treeFruits.add(fruit);
-//  }
-//
-//  public void addFruits(List<Fruit> fruits) {
-//    treeFruits.addAll(fruits);
-//    fruits.stream().forEach(f -> f.setOwner(this));
-//  }
+  public void addFruits(Fruit fruit) {
+    treeFruits.add(fruit);
+    fruit.tree = this.name;
+  }
+
+  public void addFruits(List<Fruit> fruits) {
+    treeFruits.addAll(fruits);
+    fruits.stream().forEach(f -> f.tree = this.name);
+  }
 
   public Tree() {
   }
@@ -59,6 +61,7 @@ public class Tree {
 
   public void setTreeFruits(List<Fruit> treeFruits) {
     this.treeFruits = treeFruits;
+    this.treeFruits.stream().forEach(f->f.tree = this.name);
   }
 
   public List<Fruit> getTreeFruits() {

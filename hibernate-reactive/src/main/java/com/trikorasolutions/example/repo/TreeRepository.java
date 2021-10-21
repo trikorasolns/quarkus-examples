@@ -24,7 +24,7 @@ public class TreeRepository {
   @ReactiveTransactional
   public Uni<Tree> create(Tree tree) {
     LOGGER.info("#createInRepo{}: ",tree);
-    return sf.withTransaction((s, t) -> s.persist(tree))
+    return sf.withTransaction((s, t) -> s.merge(tree))
       .replaceWith(sf.withTransaction((s, t) -> s.find(Tree.class, tree.name)));
   }
 

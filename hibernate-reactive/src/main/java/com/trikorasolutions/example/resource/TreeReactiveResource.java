@@ -95,29 +95,14 @@ public class TreeReactiveResource {
     return repoTree.listAll().onItem().transform(tree -> Response.ok(tree).build());
   }
 
+  
   @GET
-  @Path("/combine1/{family1}")
-  public Uni<RestResponse<TreeDto>> combine1(final @RestPath String family1) {
-    LOGGER.info("#combine1 f1 {}", family1 );
-
-    return logicTree.addFruitsToTree(family1).onItem().transform(fruits -> {
-      LOGGER.info("combined fruit: {}", fruits);
-      return RestResponse.ResponseBuilder.ok(fruits).build();
-
-    }).onFailure().recoverWithItem(thr -> {
-      LOGGER.info("Failure when calling findToCombine:{}", thr);
-      return RestResponse.ResponseBuilder.create(Response.Status.NOT_ACCEPTABLE, new TreeDto()).build();
-    });
-  }
-
-  @POST
-  @Path("/combine2")
+  @Path("/combine2/{family1}/{family2}")
   public Uni<RestResponse<TreeDto>> combine2(final @RestPath String family1, final @RestPath String family2) {
-    //TODO: fix the rest path arguments
-    LOGGER.info("#combined f1,f2 {}-{}", "Rutaceae", "Rosaceae");
+    LOGGER.info("#combine2 f1,f2 {}-{}", family1, family2);
 
     return logicTree.findToCombine(family1, family2).onItem().transform(fruits -> {
-      LOGGER.info("combined fruit: {}", fruits);
+      LOGGER.info("combine2 tree: {}", fruits);
       return RestResponse.ResponseBuilder.ok(fruits).build();
 
     }).onFailure().recoverWithItem(thr -> {

@@ -15,12 +15,12 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
-public class CombineTest {
+public class KindOfPersistedEntitiesTest {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CombineTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(KindOfPersistedEntitiesTest.class);
 
   @Test
-  public void testCombine() {
+  public void () {
     given().when().body(new Fruit("pear", "Pear", "Rosaceae", false)).contentType(MediaType.APPLICATION_JSON)
       .post("/fruitreact/create").then().statusCode(OK.getStatusCode())
       .body("name", containsString("pear"), "description", containsString("Pear"));
