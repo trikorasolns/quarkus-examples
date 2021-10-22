@@ -1,7 +1,7 @@
 package com.trikorasolutions.example.bl;
 
 import com.trikorasolutions.example.dto.UserDto;
-import com.trikorasolutions.example.keycloak.client.bl.KeycloakClientLogic;
+import com.trikorasolutions.keycloak.client.bl.KeycloakClientLogic;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.tuples.Tuple2;
@@ -24,24 +24,24 @@ public class UserAdminLogic {
 
   public Uni<UserDto> createUser(final String realm, final SecurityIdentity keycloakSecurityContext, final UserDto newUser) {
     return keycloakClientBl.createUser(
-        realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, UserLogic.toUserRepresentation(newUser))
+        realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, UserLogic.toUserRepresentation(newUser))
       .replaceWith(this.getUserInfo(realm, keycloakSecurityContext, newUser.userName));
   }
 
   public Uni<JsonArray> updateUser(final String realm, final SecurityIdentity keycloakSecurityContext, final String userId, final UserDto newUser) {
     return keycloakClientBl.updateUser(
-      realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, userId, UserLogic.toUserRepresentation(newUser));
+      realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, userId, UserLogic.toUserRepresentation(newUser));
   }
 
   public Uni<UserDto> getUserInfo(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
     return keycloakClientBl.getUserInfo(
-      realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, name)
+      realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, name)
       .onItem().transform(UserLogic::from);
   }
 
   public Uni<String> nameToId(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
     return keycloakClientBl.getUserInfo(
-      realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, name)
+      realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, name)
       .onItem().transform(userInfo -> {
       if (userInfo != null) return userInfo.get(0).asJsonObject().getString("id");
       else return null;
@@ -49,19 +49,19 @@ public class UserAdminLogic {
   }
 
   public Uni<JsonArray> deleteUser(final String realm, final SecurityIdentity keycloakSecurityContext, final String id) {
-    return keycloakClientBl.deleteUser(realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, id);
+    return keycloakClientBl.deleteUser(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, id);
   }
 
   public Uni<JsonArray> listAll(final String realm, final SecurityIdentity keycloakSecurityContext) {
-    return keycloakClientBl.listAll(realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID);
+    return keycloakClientBl.listAll(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID);
   }
 
   public Uni<JsonArray> getGroupInfo(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
-    return keycloakClientBl.getGroupInfo(realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, name);
+    return keycloakClientBl.getGroupInfo(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, name);
   }
 
   public Uni<String> groupNameToId(final String realm, final SecurityIdentity keycloakSecurityContext, final String name) {
-    return keycloakClientBl.getGroupInfo(realm, keycloakSecurityContext, KeycloakInfo.KEYCLOAK_CLIENT_ID, name).onItem().transform(userInfo -> {
+    return keycloakClientBl.getGroupInfo(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), KeycloakInfo.KEYCLOAK_CLIENT_ID, name).onItem().transform(userInfo -> {
       if (userInfo != null) return userInfo.get(0).asJsonObject().getString("id");
       else return null;
     });
@@ -78,7 +78,7 @@ public class UserAdminLogic {
   public Uni<List<UserDto>> getGroupUsers(final String realm, final SecurityIdentity keycloakSecurityContext, final String group) {
     return this.groupNameToId(realm, keycloakSecurityContext, group)
       .onItem()
-      .transformToUni(groupId -> keycloakClientBl.getUsersForGroup(realm, keycloakSecurityContext,KeycloakInfo.KEYCLOAK_CLIENT_ID, groupId))
+      .transformToUni(groupId -> keycloakClientBl.getUsersForGroup(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),KeycloakInfo.KEYCLOAK_CLIENT_ID, groupId))
       .onItem()
       .transform(userList -> userList.stream()
         .map(JsonValue::asJsonObject)
@@ -94,7 +94,7 @@ public class UserAdminLogic {
     Uni<Tuple2<String, String>> combinedUniTuple = Uni.combine().all().unis(userId, groupId).asTuple();
 
     return combinedUniTuple.onItem()
-      .transformToUni(tuple2 -> keycloakClientBl.putUserInGroup(realm, keycloakSecurityContext,KeycloakInfo.KEYCLOAK_CLIENT_ID,
+      .transformToUni(tuple2 -> keycloakClientBl.putUserInGroup(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),KeycloakInfo.KEYCLOAK_CLIENT_ID,
         tuple2.getItem1(),tuple2.getItem2()))
       .replaceWith( this.getUserInfo(realm,keycloakSecurityContext, userName));
   }
@@ -107,7 +107,7 @@ public class UserAdminLogic {
     Uni<Tuple2<String, String>> combinedUniTuple = Uni.combine().all().unis(userId, groupId).asTuple();
 
     return combinedUniTuple.onItem()
-      .transformToUni(tuple2 -> keycloakClientBl.deleteUserFromGroup(realm, keycloakSecurityContext,KeycloakInfo.KEYCLOAK_CLIENT_ID,
+      .transformToUni(tuple2 -> keycloakClientBl.deleteUserFromGroup(realm, keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(),KeycloakInfo.KEYCLOAK_CLIENT_ID,
         tuple2.getItem1(),tuple2.getItem2()))
       .replaceWith( this.getUserInfo(realm,keycloakSecurityContext, userName));
   }

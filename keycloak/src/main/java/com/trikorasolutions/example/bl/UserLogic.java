@@ -1,8 +1,8 @@
 package com.trikorasolutions.example.bl;
 
 import com.trikorasolutions.example.dto.UserDto;
-import com.trikorasolutions.example.keycloak.client.clientresource.KeycloakAuthorizationResource;
-import com.trikorasolutions.example.keycloak.client.dto.UserRepresentation;
+import com.trikorasolutions.keycloak.client.clientresource.KeycloakAuthorizationResource;
+import com.trikorasolutions.keycloak.client.dto.UserRepresentation;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
