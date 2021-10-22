@@ -8,7 +8,6 @@ import java.util.List;
 @Table(name = "tree")
 @NamedQuery(name = "Tree.listAll", query = "SELECT t FROM Tree t ORDER BY t.name")
 @NamedQuery(name = "Tree.delete", query = "DELETE FROM Tree t WHERE t.name = :name")
-@NamedQuery(name = "Tree.byName", query = "SELECT t FROM Tree t WHERE t.name = :name")
 public class Tree {
 
   @Id

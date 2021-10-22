@@ -138,16 +138,28 @@ public class TreeReactiveResource {
       });
   }
 
-//  @POST
-//  @Path("/persistOnlyFruits/{treeName}")
-//  public Uni<RestResponse<TreeDto>> persistOnlyFruits(final List<FruitDto> fruitsInDto, @RestPath String treeName) {
-//    LOGGER.info("#persistNoneCreated(String) {}", treeName);
-//
-//    return logicTree.persistOnlyFruits(fruitsInDto,treeName ).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
-//      .onFailure().recoverWithItem(ex -> {
-//        LOGGER.error("ex: {}", ex);
-//        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
-//      });
-//  }
+  @POST
+  @Path("/persistOnlyFruits/{treeName}")
+  public Uni<RestResponse<TreeDto>> persistOnlyFruits(final List<FruitDto> fruitsInDto, @RestPath String treeName) {
+    LOGGER.info("#persistNoneCreated(String) {}", treeName);
+
+    return logicTree.persistOnlyFruits(fruitsInDto,treeName ).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
+      .onFailure().recoverWithItem(ex -> {
+        LOGGER.error("ex: {}", ex);
+        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
+      });
+  }
+
+  @POST
+  @Path("/persistOnlyTree/{treeName}")
+  public Uni<RestResponse<TreeDto>> persistOnlyTree(final Tree tree, @RestPath String family) {
+    LOGGER.info("#persistNoneCreated(String) {}", tree.name);
+
+    return logicTree.persistAlreadyCreated(tree, family).onItem().transform(tree1 -> RestResponse.ResponseBuilder.ok(tree1).build())
+      .onFailure().recoverWithItem(ex -> {
+        LOGGER.error("ex: {}", ex);
+        return RestResponse.ResponseBuilder.create(Response.Status.CONFLICT, new TreeDto()).build();
+      });
+  }
 
 }

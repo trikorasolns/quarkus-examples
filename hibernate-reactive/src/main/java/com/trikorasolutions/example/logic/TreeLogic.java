@@ -19,6 +19,7 @@ import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class TreeLogic {
@@ -99,14 +100,19 @@ public class TreeLogic {
       .onItem().transformToUni(treeF->getFullTree(treeF.name));
   }
 
-//  @ReactiveTransactional
-//  public Uni<TreeDto> persistOnlyFruits(List<FruitDto> fruits, final String treeName) {
-//    LOGGER.info("#persistNoneCreated(logic) {}", tree.name);
-//
-//    // Insert the new tree and the new fruits just by persisting the tree
-//    return repoTree.create(tree.toTree())
-//      .onItem().transformToUni(treeF->getFullTree(treeF.name));
-//  }
+  @ReactiveTransactional
+  public Uni<TreeDto> persistOnlyFruits(List<FruitDto> fruits, final String treeName) {
+    LOGGER.info("#persistNoneCreated(logic) {}", treeName);
+
+    // Get the tree from the db
+    Uni<Tree> tree = sf.withTransaction((s, t) -> s.find(Tree.class, treeName));
+    // Parse Dto to fruits
+    List<Fruit> lst = fruits.stream().map(f-> f.toFruit()).collect(Collectors.toList());
+
+    return tree.onItem().invoke(t-> t.addFruits(lst))
+      .onItem().call(tr->repoTree.create(tr))
+      .onItem().transformToUni(treeF->getFullTree(treeF.name));
+  }
 
 
 
