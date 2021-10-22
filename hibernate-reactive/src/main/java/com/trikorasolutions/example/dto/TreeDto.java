@@ -1,7 +1,6 @@
 package com.trikorasolutions.example.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.trikorasolutions.example.logic.TreeLogic;
 import com.trikorasolutions.example.model.Fruit;
 import com.trikorasolutions.example.model.Tree;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class TreeDto {
   private static final Logger LOGGER = LoggerFactory.getLogger(TreeDto.class);

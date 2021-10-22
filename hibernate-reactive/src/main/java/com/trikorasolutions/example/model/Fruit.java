@@ -1,11 +1,4 @@
 package com.trikorasolutions.example.model;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-
 import javax.persistence.*;
 
 @Entity
@@ -15,8 +8,6 @@ import javax.persistence.*;
 @NamedQuery(name = "Fruit.fetchFamily", query = "SELECT f FROM Fruit f WHERE f.family = :family")
 @NamedQuery(name = "Fruit.fetchByTree", query = "SELECT f FROM Fruit f WHERE f.tree = :tree")
 public class Fruit {
-  //https://vladmihalcea.com/how-to-customize-an-entity-association-join-on-clause-with-hibernate-joinformula/
-  //@JoinFormula("(SELECT t.name FROM tree t WHERE t.name = tree)")
   @Id
   @Column(length = 50, unique = true, name = "name")
   public String name;
@@ -30,16 +21,8 @@ public class Fruit {
   @Column(nullable = false, name = "ripen")
   public Boolean ripen = false;
 
+  @Column(length = 50, name = "tree")
   public String tree;
-
-  //@ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumnsOrFormulas(value = {
-    @JoinColumnOrFormula(formula=@JoinFormula( value= "(SELECT t.name FROM tree t LIMIT 1)", referencedColumnName="ownerTree")),
-    @JoinColumnOrFormula(column= @JoinColumn( name= "ownerTree", referencedColumnName="name"/*, updatable=false, insertable=false*/))
-  })
-
-  @Column(length = 50, name = "ownerTree")
-  private String ownerTree;
 
   public Fruit() {
   }
@@ -66,7 +49,7 @@ public class Fruit {
 
   @Override
   public String toString() {
-    return "Fruit{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", family='" + family + '\'' + ", ripen=" + ripen + ", tree='" + tree + '\'' + ", ownerTree='" + ownerTree + '\'' + '}';
+    return "Fruit{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", family='" + family + '\'' + ", ripen=" + ripen + ", tree='" + tree + '\'' + '}';
   }
 
   public String getName() {
@@ -100,8 +83,4 @@ public class Fruit {
   public void setRipen(Boolean ripen) {
     this.ripen = ripen;
   }
-
-  public String getOwnerTree() { return ownerTree;}
-
-  public void setOwnerTree(String ownerTree) { this.ownerTree = ownerTree;}
 }

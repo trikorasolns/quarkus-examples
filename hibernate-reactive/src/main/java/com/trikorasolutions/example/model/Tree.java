@@ -14,8 +14,8 @@ public class Tree {
   @Column(length = 50, unique = true, name ="name")
   public String name;
 
-  //@OneToMany(cascade = {CascadeType.REFRESH,CascadeType.DETACH,CascadeType.MERGE,CascadeType.REMOVE}, mappedBy = "ownerTree", orphanRemoval = true, fetch = FetchType.LAZY)
-  @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "ownerTree", orphanRemoval = true, fetch = FetchType.LAZY)
+  @OneToMany(cascade = {CascadeType.ALL},  fetch = FetchType.LAZY)
+  @JoinColumn(name= "tree",referencedColumnName = "name")
   private List<Fruit> treeFruits;
 
   public void addFruits(Fruit fruit) {
@@ -67,11 +67,9 @@ public class Tree {
     if(this.treeFruits !=null ){
       this.treeFruits.stream().forEach(f->f.tree = this.name);
     }
-
   }
 
   public List<Fruit> getTreeFruits() {
     return this.treeFruits;
   }
-
 }

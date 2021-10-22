@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.PostPersist;
-import javax.persistence.PrePersist;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,17 +36,29 @@ public class TreeLogic {
     LOGGER.info("#createInLogic(String)... {}", tree.name);
     return repoTree.create(tree.toTree())
       .onItem().transform(TreeDto::from)
-      .replaceWith(this.getFullTree(tree.name));
+      .replaceWith(this.getFullTreeMutinyFetch(tree.name));
 
   }
 
-  public Uni<TreeDto> getFullTree(String treeName) {
+  public Uni<TreeDto> getFullTreeManually(String treeName) {
     LOGGER.info("#getFullTree(String){}: ", treeName);
     TreeDto newTree = new TreeDto(treeName);
 
     return sf.withTransaction(
       (s, t) -> s.find(Tree.class, treeName)
         .chain(fTree -> repoFruit.findByTree(fTree.name))
+        .onItem().transform(FruitDto::allFrom)
+        .invoke(dbTree -> newTree.setFruits(dbTree))
+        .replaceWith(newTree));
+  }
+
+  public Uni<TreeDto> getFullTreeMutinyFetch(String treeName) {
+    LOGGER.info("#getFullTree(String){}: ", treeName);
+    TreeDto newTree = new TreeDto(treeName);
+
+    return sf.withTransaction(
+      (s, t) -> s.find(Tree.class, treeName)
+        .chain(fTree -> Mutiny.fetch(fTree.getTreeFruits()))
         .onItem().transform(FruitDto::allFrom)
         .invoke(dbTree -> newTree.setFruits(dbTree))
         .replaceWith(newTree));
@@ -75,7 +85,7 @@ public class TreeLogic {
       tree.setTreeFruits(lst);
       return repoTree.create(tree); // Returns find tree
 
-    }).onItem().transformToUni(tree->getFullTree(tree.name));
+    }).onItem().transformToUni(tree->getFullTreeMutinyFetch(tree.name));
   }
 
   @ReactiveTransactional
@@ -87,7 +97,7 @@ public class TreeLogic {
       tree.setTreeFruits(list);
       return repoTree.create(tree); // Returns find tree
 
-    }).onItem().transformToUni(treeF->getFullTree(treeF.name));
+    }).onItem().transformToUni(treeF->getFullTreeMutinyFetch(treeF.name));
 
   }
 
@@ -97,7 +107,7 @@ public class TreeLogic {
 
     // Insert the new tree and the new fruits just by persisting the tree
     return repoTree.create(tree.toTree())
-      .onItem().transformToUni(treeF->getFullTree(treeF.name));
+      .onItem().transformToUni(treeF->getFullTreeMutinyFetch(treeF.name));
   }
 
   @ReactiveTransactional
@@ -111,11 +121,6 @@ public class TreeLogic {
 
     return tree.onItem().invoke(t-> t.addFruits(lst))
       .onItem().call(tr->repoTree.create(tr))
-      .onItem().transformToUni(treeF->getFullTree(treeF.name));
+      .onItem().transformToUni(treeF->getFullTreeMutinyFetch(treeF.name));
   }
-
-
-
 }
-
-

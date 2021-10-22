@@ -3,12 +3,10 @@ package com.trikorasolutions.example;
 import com.trikorasolutions.example.dto.FruitDto;
 import com.trikorasolutions.example.dto.TreeDto;
 import io.quarkus.test.junit.QuarkusTest;
-import org.hibernate.reactive.mutiny.Mutiny;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +19,6 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 public class TreeDtoResourceTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(TreeDtoResourceTest.class);
-
-  @Inject
-  Mutiny.SessionFactory sf;
-
-//  @BeforeEach
-//  public void clearDatabase() {
-//    LOGGER.warn("delete from database");
-//    Integer res = sf.withTransaction((s, t) -> s.createQuery("DELETE FROM Fruit").executeUpdate()).await()
-//      .atMost(Duration.ofSeconds(30));
-//    Integer res2 = sf.withTransaction((s, t) -> s.createQuery("DELETE FROM Tree").executeUpdate()).await()
-//      .atMost(Duration.ofSeconds(30));
-//    LOGGER.warn("{} records removed", res + res2);
-//  }
 
   @Test
   public void getTreeOk() {
@@ -73,7 +58,11 @@ public class TreeDtoResourceTest {
 
     // Ensure the tree is persisted
     given().when().body(tree).contentType(MediaType.APPLICATION_JSON).post("/tree/create").then()
-      .statusCode(OK.getStatusCode()).body("name", is("createTreeWithFruitsOk"));
+      .statusCode(OK.getStatusCode()).body("name", is("createTreeWithFruitsOk"), "fruits.size()", is(fruits.size()));
+
+    // Ensure that the full tree is persisted
+    given().when().get(String.format("/tree/name/%s", tree.name)).then().statusCode(OK.getStatusCode())
+      .body("name", is("createTreeWithFruitsOk"));
 
     // Ensure that the fruits persisted when persisting the tree are in th db
     given().when().get("/fruitreact/name/orange").then().statusCode(OK.getStatusCode()).body("name", is("orange"));
@@ -83,5 +72,4 @@ public class TreeDtoResourceTest {
     given().when().get(String.format("/tree/getFull/name/%s", tree.name)).then().statusCode(OK.getStatusCode())
       .body("name", is("createTreeWithFruitsOk"), "fruits.size()", is(fruits.size()));
   }
-
 }

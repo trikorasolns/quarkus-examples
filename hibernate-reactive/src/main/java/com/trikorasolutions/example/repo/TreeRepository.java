@@ -1,12 +1,8 @@
 package com.trikorasolutions.example.repo;
-
 import com.trikorasolutions.example.dto.TreeDto;
-import com.trikorasolutions.example.model.Fruit;
 import com.trikorasolutions.example.model.Tree;
-import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Uni;
-import org.hibernate.Hibernate;
 import org.hibernate.reactive.mutiny.Mutiny;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

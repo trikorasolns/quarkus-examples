@@ -1,8 +1,5 @@
 package com.trikorasolutions.example.resource;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.trikorasolutions.example.dto.FruitDto;
 import com.trikorasolutions.example.dto.TreeDto;
 import com.trikorasolutions.example.logic.TreeLogic;
@@ -21,8 +18,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
@@ -68,7 +63,7 @@ public class TreeReactiveResource {
   @Path("getFull/name/{name}")
   public Uni<RestResponse<TreeDto>> getFullTree(final @RestPath("name") String name) {
     LOGGER.info("#getFullTree(String): {}", name);
-    return logicTree.getFullTree(name).onItem().transform(tree -> {
+    return logicTree.getFullTreeMutinyFetch(name).onItem().transform(tree -> {
       LOGGER.info("fetched tree: {}", tree);
       if (tree != null) {
         return RestResponse.ResponseBuilder.ok(tree).build();
