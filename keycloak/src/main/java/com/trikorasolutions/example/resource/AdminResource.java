@@ -1,17 +1,14 @@
 package com.trikorasolutions.example.resource;
 
-import com.trikorasolutions.example.bl.KeycloakInfo;
 import com.trikorasolutions.example.bl.UserAdminLogic;
-import com.trikorasolutions.example.bl.UserLogic;
 import com.trikorasolutions.example.dto.UserDto;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.jwt.JsonWebToken;
+
 import org.jboss.resteasy.reactive.NoCache;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.JsonArray;
@@ -19,7 +16,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.CONFLICT;
@@ -35,9 +31,6 @@ public class AdminResource {
   SecurityIdentity keycloakSecurityContext;
 
   @Inject
-  JsonWebToken jwt;
-
-  @Inject
   UserAdminLogic userAdminLogic;
 
   @GET
@@ -51,12 +44,17 @@ public class AdminResource {
   @GET
   @Path("/listUsers/{realm}")
   @NoCache
-  public Uni<RestResponse<JsonArray>> listUsers(@PathParam("realm") String realm) {
+  public Uni<RestResponse<List<UserDto>>> listUsers(@PathParam("realm") String realm) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#listUsers: realm name{}", realm);
     }
-    return userAdminLogic.listAll(realm, keycloakSecurityContext).onItem()
-      .transform(userList -> RestResponse.ResponseBuilder.ok(userList).build());
+    return userAdminLogic.listAll(realm, keycloakSecurityContext).onItem().transform(userList -> {
+      LOGGER.debug("User list fetched correctly in realm : {}",realm);
+      return RestResponse.ResponseBuilder.ok(userList).build();
+    }).onFailure().recoverWithItem(throwable -> {
+      LOGGER.info("Error when listing the users with exception:{}", throwable);
+      return RestResponse.ResponseBuilder.ok((List<UserDto>) new ArrayList<UserDto>()).status(CONFLICT).build();
+    });
   }
 
   @POST
@@ -64,7 +62,7 @@ public class AdminResource {
   @NoCache
   public Uni<RestResponse<UserDto>> createUser(@PathParam("realm") String realm, final UserDto newUser) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("#createUser: username{}", newUser.userName);
+      LOGGER.debug("#createUser, username: {}", newUser.userName);
     }
     return userAdminLogic.createUser(realm, keycloakSecurityContext, newUser).onItem().transform(userDto -> {
       LOGGER.debug("User created correctly: {}", userDto);
@@ -82,28 +80,29 @@ public class AdminResource {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#updateUser username: {}", user.userName);
     }
-
-    return userAdminLogic.nameToId(realm, keycloakSecurityContext, user.userName).onItem()
-      .call(userid -> userAdminLogic.updateUser(realm, keycloakSecurityContext, userid, user))
-      .replaceWith(userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user.userName)).onItem()
-      .transform(userDto -> RestResponse.ResponseBuilder.ok(userDto).build()).onFailure().recoverWithItem(
-        throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build());
+    return userAdminLogic.updateUser(realm, keycloakSecurityContext, user.userName, user)
+      .onItem().transform(userDto ->{
+        return RestResponse.ResponseBuilder.ok(userDto).build();
+      }).onFailure().recoverWithItem(throwable ->{
+        LOGGER.debug("Error when updating user with exception:{}", throwable);
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
+      });
   }
 
   @GET
   @Path("/{realm}/users/{user}")
   @NoCache
   public Uni<RestResponse<UserDto>> getUserInfo(@PathParam("realm") String realm, @PathParam("user") String user) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("#getUserInfo: {}", user);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#getUserInfo: {}", user);
     }
     return userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user).onItem().transform(userDto -> {
-      if (userDto == null) {
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
-      } else {
-        return RestResponse.ResponseBuilder.ok(userDto).build();
-      }
-    }).onFailure().recoverWithItem(throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build());
+      LOGGER.debug("User info fetched correctly: {}", userDto);
+      return RestResponse.ResponseBuilder.ok(userDto).build();
+    }).onFailure().recoverWithItem(throwable -> {
+      LOGGER.info("Error when fetching user info with exception:{}", throwable);
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
+    });
   }
 
   @DELETE
@@ -111,13 +110,16 @@ public class AdminResource {
   @NoCache
   public Uni<RestResponse<Void>> deleteUser(@PathParam("realm") String realm, @PathParam("user") String user) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.info("#deleteUser: {} with ID: {}", user, userAdminLogic.nameToId(realm, keycloakSecurityContext, user));
+      LOGGER.info("#deleteUser: {} with ID: {}", user);
     }
-    return userAdminLogic.nameToId(realm, keycloakSecurityContext, user).onItem()
-      .call(userid -> userAdminLogic.deleteUser(realm, keycloakSecurityContext, userid)).onItem()
-      .transform(userDto -> RestResponse.ResponseBuilder.ok().build()).onFailure()
-      .recoverWithItem(throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND).build());
-
+    return userAdminLogic.deleteUser(realm, keycloakSecurityContext, user).onItem().transform(userDto ->{
+        LOGGER.debug("User deleted correctly: {}", userDto);
+        return RestResponse.ResponseBuilder.ok().build();
+      }).onFailure().recoverWithItem(throwable ->{
+        // Do not print anything, deleting an unknown user is not consider an error
+        LOGGER.debug("Error when deleting user with exception:{}", throwable);
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND).build();
+    });
   }
 
   @GET
@@ -128,13 +130,12 @@ public class AdminResource {
       LOGGER.debug("#getGroupInfo: {}", group);
     }
     return userAdminLogic.getGroupInfo(realm, keycloakSecurityContext, group).onItem().transform(groupArray -> {
-      if (groupArray == null) {
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, JsonArray.EMPTY_JSON_ARRAY).build();
-      } else {
-        return RestResponse.ResponseBuilder.ok(groupArray).build();
-      }
-    }).onFailure().recoverWithItem(
-      throwable -> RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonArray.EMPTY_JSON_ARRAY).build());
+      LOGGER.debug("Group info fetched correctly: {}", group);
+      return RestResponse.ResponseBuilder.ok(groupArray).build();
+    }).onFailure().recoverWithItem(throwable -> {
+      LOGGER.info("Error when fetching group info with exception:{}", throwable);
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonArray.EMPTY_JSON_ARRAY).build();
+    });
   }
 
   @GET
@@ -142,19 +143,14 @@ public class AdminResource {
   @NoCache
   public Uni<RestResponse<List<UserDto>>> listGroupUsers(@PathParam("realm") String realm, @PathParam("group") String group) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("#listGroupUsers: realm name{}-{}", realm, group);
+      LOGGER.debug("#listGroupUsers: realm name {}-{}", realm, group);
     }
-    List<UserDto> emptyUserDtoList = new ArrayList<>();
-
     return userAdminLogic.getGroupUsers(realm, keycloakSecurityContext, group).onItem().transform(userDtoList -> {
-      if (userDtoList == null) {
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, emptyUserDtoList).build();
-      } else {
-        return RestResponse.ResponseBuilder.ok(userDtoList).build();
-      }
+      LOGGER.debug("Group users fetched correctly: {}", group);
+      return RestResponse.ResponseBuilder.ok(userDtoList).build();
     }).onFailure().recoverWithItem(throwable -> {
-      LOGGER.debug("ES FAIL{}", throwable.getMessage());
-      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, emptyUserDtoList).build();
+      LOGGER.info("Error when fetching group users with exception:{}", throwable);
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, (List<UserDto>) new ArrayList<UserDto>()).build();
     });
   }
 
@@ -163,14 +159,14 @@ public class AdminResource {
   @NoCache
   public Uni<RestResponse<UserDto>> putUserInGroup(@PathParam("realm") String realm, @PathParam("user") String user,
                                                    @PathParam("group") String group) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#putUserInGroup: group {}", group);
+    }
     return userAdminLogic.putUserInGroup(realm, keycloakSecurityContext, user, group).onItem().transform(userDto -> {
-      if (userDto == null) {
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
-      } else {
-        return RestResponse.ResponseBuilder.ok(userDto).build();
-      }
+      LOGGER.debug("User has been added to the group: {}", group);
+      return RestResponse.ResponseBuilder.ok(userDto).build();
     }).onFailure().recoverWithItem(throwable -> {
-      LOGGER.debug("ES FAIL{}", throwable.getMessage());
+      LOGGER.debug("Error when adding user to the group with exception:{}", throwable);
       return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
     });
   }
@@ -180,14 +176,14 @@ public class AdminResource {
   @NoCache
   public Uni<RestResponse<UserDto>> deleteUserFromGroup(@PathParam("realm") String realm, @PathParam("user") String user,
                                                    @PathParam("group") String group) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("#deleteUserFromGroup: group {}", group);
+    }
     return userAdminLogic.deleteUserFromGroup(realm, keycloakSecurityContext, user, group).onItem().transform(userDto -> {
-      if (userDto == null) {
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
-      } else {
-        return RestResponse.ResponseBuilder.ok(userDto).build();
-      }
+      LOGGER.debug("User has been removed from the group: {}", group);
+      return RestResponse.ResponseBuilder.ok(userDto).build();
     }).onFailure().recoverWithItem(throwable -> {
-      LOGGER.debug("ES FAIL{}", throwable.getMessage());
+      LOGGER.debug("Error when removing user from the group with exception:{}", throwable);
       return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
     });
   }

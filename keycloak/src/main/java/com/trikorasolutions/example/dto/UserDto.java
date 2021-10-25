@@ -1,47 +1,47 @@
 package com.trikorasolutions.example.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.security.credential.Credential;
-import javax.json.bind.annotation.JsonbProperty;
 import java.util.Collection;
 import java.util.Set;
 
 
 public class UserDto {
 
-  @JsonbProperty("userName")
+  @JsonProperty("userName")
   public String userName;
 
-  @JsonbProperty("givenName")
+  @JsonProperty("givenName")
   public String givenName;
 
-  @JsonbProperty("familyName")
+  @JsonProperty("familyName")
   public String familyName;
 
-  @JsonbProperty("nickName")
+  @JsonProperty("nickName")
   public String nickName;
 
-  @JsonbProperty("preferredUsername")
+  @JsonProperty("preferredUsername")
   public String preferredUsername;
 
-  @JsonbProperty("email")
+  @JsonProperty("email")
   public String email;
 
-  @JsonbProperty("emailVerified")
+  @JsonProperty("emailVerified")
   public String emailVerified;
 
-  @JsonbProperty("groups")
+  @JsonProperty("groups")
   public Set<String> groups;
 
-  @JsonbProperty("userPermissions")
+  @JsonProperty("userPermissions")
   public Collection<Object> userPermissions;
 
-  @JsonbProperty("userCredentials")
+  @JsonProperty("userCredentials")
   public Set<Credential> userCredentials;
 
-  @JsonbProperty("userRoles")
+  @JsonProperty("userRoles")
   public Set<String> userRoles;
 
-  @JsonbProperty("enabled")
+  @JsonProperty("enabled")
   public Boolean enabled;
 
   public UserDto() {}
