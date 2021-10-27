@@ -23,6 +23,9 @@ dependencies {
   implementation 'io.quarkus:quarkus-smallrye-health'
   implementation 'io.quarkus:quarkus-smallrye-graphql'
   implementation 'io.quarkus:quarkus-smallrye-openapi'
+  // Trikora
+  implementation "io.github.trikorasolns:keycloak-quarkus-client:${ioGithubTrikorasolnsKeycloakQuarkusClientVersion}"
+
   // Test
   testImplementation 'io.quarkus:quarkus-junit5'
   testImplementation 'io.rest-assured:rest-assured'

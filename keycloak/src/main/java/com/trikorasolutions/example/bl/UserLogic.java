@@ -1,8 +1,8 @@
 package com.trikorasolutions.example.bl;
 
 import com.trikorasolutions.example.dto.UserDto;
-import com.trikorasolutions.example.keycloak.client.clientresource.KeycloakAuthorizationResource;
-import com.trikorasolutions.example.keycloak.client.dto.UserRepresentation;
+import com.trikorasolutions.keycloak.client.clientresource.KeycloakAuthorizationResource;
+import com.trikorasolutions.keycloak.client.dto.UserRepresentation;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -33,23 +33,26 @@ public class UserLogic {
   }
 
   public static UserRepresentation toUserRepresentation(UserDto from) {
+    LOGGER.debug("#toUserRepresentation(UserDto)... {}", from);
     return new UserRepresentation(from.givenName, from.familyName, from.email,
       from.enabled, from.userName);
   }
 
   public static UserDto toUserDto(UserRepresentation from) {
+    LOGGER.debug("#toUserDto(UserDto)... {}", from);
     return new UserDto(from.firstName, from.lastName, from.email,
       from.enabled, from.username);
   }
 
   public static UserDto from(JsonArray from) {
+    LOGGER.debug("#from(JsonArray)... {}", from);
     // We only parse one user, so it must be stored in position with index 0
     JsonObject toParse;
 
     try {
        toParse = from.getJsonObject(0);
     }catch (IndexOutOfBoundsException e){
-      return null;
+      return new UserDto("Unknown User");
     }
 
     return new UserDto(toParse.getString("firstName"),toParse.getString("lastName"),
@@ -57,32 +60,35 @@ public class UserLogic {
   }
 
   public static UserDto from(JsonObject from) {
+    LOGGER.debug("#from(JsonObject)... {}", from);
     // Cannot reuse code since keycloak response fields have different keys between
     // admin and user endpoints
-
     if (from.containsKey("given_name")){
       return new UserDto(from.getString("given_name"),from.getString("family_name"),
         from.getString("email"),true, from.getString("preferred_username"));
+    }else if (!from.containsKey("lastName")){ // Admin user do not have family name
+      return new UserDto(from.getString("firstName"), "IS_CONFIDENTIAL",
+        from.getString("email"), false, from.getString("username"));
     }else{
       return new UserDto(from.getString("firstName"),from.getString("lastName"),
         from.getString("email"),from.getBoolean("enabled"), from.getString("username"));
     }
   }
 
-  /**
-   * This function return the information of the current user, a user only can request its own information
-   * @param realm
-   * @param keycloakSecurityContext
-   * @return
-   */
+  public static String getToken(SecurityIdentity keycloakSecurityContext){
+    LOGGER.debug("#getToken(SecurityIdentity)... {}", keycloakSecurityContext);
+    return keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken();
+  }
+
   public Uni<UserDto> keycloakUserInfo(final String realm, final SecurityIdentity keycloakSecurityContext) {
+    LOGGER.debug("#keycloakUserInfo(String)... {}", realm);
     return keycloakClient.userInfo(
       "Bearer " + keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken(), realm,
       "implicit", KeycloakInfo.KEYCLOAK_CLIENT_ID).onItem().transform(jsonObject -> this.from(jsonObject));
   }
 
   public String getTenant(final JsonWebToken jwt, final String tenantName) {
+    LOGGER.debug("#getTenant(String)... {}", tenantName);
     return jwt.getClaim(tenantName).toString();
   }
-
 }
