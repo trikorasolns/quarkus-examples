@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.OK;
@@ -17,8 +19,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
-public class TreeResourceTest {
-  private static final Logger LOGGER = LoggerFactory.getLogger(TreeResourceTest.class);
+public class TreeDtoResourceTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(TreeDtoResourceTest.class);
 
 
   @Test
@@ -37,7 +39,6 @@ public class TreeResourceTest {
     }};
 
     Tree tree = new Tree("AnotherTree");
-
     tree.setTreeFruits(fruits);
 
     // Ensure the tree is persisted

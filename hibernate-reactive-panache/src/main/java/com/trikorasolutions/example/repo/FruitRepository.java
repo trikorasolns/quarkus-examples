@@ -1,17 +1,25 @@
 package com.trikorasolutions.example.repo;
 
 import com.trikorasolutions.example.model.Fruit;
+import com.trikorasolutions.example.model.Tree;
 import io.quarkus.hibernate.reactive.panache.PanacheRepositoryBase;
 import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
+import io.quarkus.panache.common.Parameters;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.tuples.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
+  @Inject
+  TreeRepository repoTree;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(FruitRepository.class);
 
   /**
@@ -33,8 +41,6 @@ public class FruitRepository implements PanacheRepositoryBase<Fruit, String> {
    */
   @ReactiveTransactional
   public Uni<Fruit> change(Fruit fruit) {
-    LOGGER.info("REPO UPDATE{}", fruit);
-
     return this.findById(fruit.name).onItem().call(f->{
       f.setDescription(fruit.description);
       f.setFamily(fruit.family);

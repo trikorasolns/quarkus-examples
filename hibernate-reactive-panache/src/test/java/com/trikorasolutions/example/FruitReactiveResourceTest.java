@@ -82,8 +82,6 @@ public class FruitReactiveResourceTest {
 
   @Test
   public void testUpdate() {
-
-    LOGGER.info("EMPIEZA EL TEST");
     given().when()
       .body(new Fruit("pear", "Updated-Pear", "PearFam", true))
       .contentType(MediaType.APPLICATION_JSON)

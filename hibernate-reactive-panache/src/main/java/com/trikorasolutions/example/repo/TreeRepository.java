@@ -44,8 +44,6 @@ public class TreeRepository implements PanacheRepositoryBase<Tree, String> {
    */
   @ReactiveTransactional
   public Uni<Tree> change(Tree tree) {
-    LOGGER.info("REPO UPDATE{}", tree);
-
     return this.findById(tree.name).onItem().call(f -> {
       tree.setTreeFruits(tree.getTreeFruits());
       return f.persist();

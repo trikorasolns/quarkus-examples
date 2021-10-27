@@ -2,37 +2,33 @@ package com.trikorasolutions.example.model;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "Tree")
 @Table(name = "tree")
-@ApplicationScoped
 public class Tree extends PanacheEntityBase {
   @Id
   @Column(length = 50, unique = true)
   public String name;
 
-
-  @OneToMany(
-    mappedBy = "tree",
-    cascade = CascadeType.ALL,
-    orphanRemoval = true
-  )
-//  @JoinColumn(name="tree_id")
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Fruit> treeFruits;
 
-  public void addFruit(Fruit fruit) {
+  public void addFruits(Fruit fruit) {
     treeFruits.add(fruit);
-    fruit.setTree(this);
+    fruit.setTree(this.name);
   }
 
-  public void removeComment(Fruit fruit) {
-    treeFruits.remove(fruit);
-    fruit.setTree(null);
+  public void addFruits(List<Fruit> fruits) {
+    treeFruits.addAll(fruits);
+    fruits.stream().forEach(fruit -> fruit.setTree(this.name));
   }
+
+//  public void removeComment(Fruit fruit) {
+//    treeFruits.remove(fruit);
+//    fruit.setTree(null);
+//  }
 
   public Tree() {
   }
@@ -59,7 +55,7 @@ public class Tree extends PanacheEntityBase {
   }
 
   public List<Fruit> getTreeFruits() {
-      return this.treeFruits;
+    return this.treeFruits;
   }
 
 }

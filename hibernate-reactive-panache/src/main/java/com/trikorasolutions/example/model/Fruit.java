@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 @Entity(name = "Fruit")
 @Table(name = "fruit")
-@ApplicationScoped
 public class Fruit extends PanacheEntityBase {
   @Id
   @Column(length = 50, unique = true)
@@ -22,8 +21,11 @@ public class Fruit extends PanacheEntityBase {
   @Column(nullable = false)
   public Boolean ripen = false;
 
+  @Column(length = 50)
+  public String tree;
+
   @ManyToOne(fetch = FetchType.LAZY)
-  private Tree tree;
+  private Tree owner;
 
   public Fruit() {
   }
@@ -69,12 +71,22 @@ public class Fruit extends PanacheEntityBase {
     this.name = name;
   }
 
-  public void setTree(Tree tree) {
+
+  public String getTree() {
+    return tree;
+  }
+
+  public void setTree(String tree) {
     this.tree = tree;
   }
 
-  public Tree getTree() {
-    return this.tree;
+  public Tree getOwner() {
+    return owner;
   }
+
+  public void setOwner(Tree owner) {
+    this.owner = owner;
+  }
+
 
 }
