@@ -19,9 +19,8 @@ public class AdminLogicGroupTest {
   public void testGroupInfoOk() {
     RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
       .get("/api/admin/trikorasolutions/groups/tenant-tenant1").then().statusCode(OK.getStatusCode())
-      .body("$.size()", is(1),
-        "id.chars", Matchers.hasItem("a674d8a1-8a4d-42d5-976d-ba9c74d29433"),
-        "name.chars", Matchers.hasItem("tenant-tenant1")
+      .body("id.chars", Matchers.is("a674d8a1-8a4d-42d5-976d-ba9c74d29433"),
+        "name.chars", Matchers.is("tenant-tenant1")
       );
 
     RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
@@ -34,8 +33,8 @@ public class AdminLogicGroupTest {
   @Test
   public void testGroupInfoErr() {
     RestAssured.given().auth().oauth2(getAccessToken("admin")).when().contentType("application/json")
-      .get("/api/admin/trikorasolutions/groups/unknown").then().statusCode(OK.getStatusCode())
-      .body("$.size()", is(0));
+      .get("/api/admin/trikorasolutions/groups/unknown").then().statusCode(NOT_FOUND.getStatusCode());
+
   }
 
   @Test

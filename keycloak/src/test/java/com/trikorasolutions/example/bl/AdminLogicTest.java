@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import static com.trikorasolutions.example.bl.KeycloakInfo.getAccessToken;
 import static javax.ws.rs.core.Response.Status.*;
-import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
 public class AdminLogicTest {
@@ -47,36 +46,77 @@ public class AdminLogicTest {
   }
 
   @Test
-  public void testUserCreateErr() {
+  public void testUserCreateDuplicateErr() {
     UserDto testUserDto = new UserDto("testUserCreateErr","testUserCreateErr","testUserCreateErr@trikorasolutions.com",
       true,"testUserCreateErr");
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .contentType("application/json")
+      .when().contentType("application/json")
       .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
     ;
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .body(testUserDto)
-      .contentType("application/json")
+      .when().body(testUserDto).contentType("application/json")
       .post("/api/admin/trikorasolutions/users")
       .then().statusCode(OK.getStatusCode())
     ;
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .body(testUserDto)
-      .contentType("application/json")
+      .when().body(testUserDto).contentType("application/json")
       .post("/api/admin/trikorasolutions/users")
       .then().statusCode(CONFLICT.getStatusCode())
     ;
+  }
+
+  @Test
+  public void testUserCreateUnauthorizedErr() {
+    UserDto testUserDto = new UserDto("testUserCreateErr","testUserCreateErr","testUserCreateErr@trikorasolutions.com",
+      true,"testUserCreateErr");
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .contentType("application/json")
+      .when().contentType("application/json")
       .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
+    ;
+
+    RestAssured.given().auth().oauth2("unknown")
+      .when().body(testUserDto).contentType("application/json")
+      .post("/api/admin/trikorasolutions/users")
+      .then().statusCode(UNAUTHORIZED.getStatusCode())
+    ;
+  }
+
+  @Test
+  public void testUserCreateNoRealmErr() {
+    UserDto testUserDto = new UserDto("testUserCreateErr","testUserCreateErr","testUserCreateErr@trikorasolutions.com",
+      true,"testUserCreateErr");
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when().contentType("application/json")
+      .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
+    ;
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when().body(testUserDto).contentType("application/json")
+      .post("/api/admin/unknown/users")
+      .then().statusCode(NOT_FOUND.getStatusCode())
+    ;
+  }
+
+  @Test
+  public void testUserCreateMarshallingErr() {
+    UserDto testUserDto = new UserDto("testUserCreateErr","testUserCreateErr","testUserCreateErr@trikorasolutions.com",
+      true,"testUserCreateErr");
+
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when().contentType("application/json")
+      .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
+    ;
+
+    testUserDto.userName = null;
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when().body(testUserDto).contentType("application/json")
+      .post("/api/admin/trikorasolutions/users")
+      .then().statusCode(BAD_REQUEST.getStatusCode())
     ;
   }
 
@@ -109,11 +149,6 @@ public class AdminLogicTest {
         "email", Matchers.containsString(testUserDto.email.toLowerCase())
       );
 
-    RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .contentType("application/json")
-      .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
-    ;
   }
 
   @Test
@@ -123,8 +158,7 @@ public class AdminLogicTest {
       .contentType("application/json")
       .get("/api/admin/trikorasolutions/users/unknown")
       .then()
-      .statusCode(OK.getStatusCode())
-      .body("userName", is("Unknown User"))
+      .statusCode(NOT_FOUND.getStatusCode())
     ;
   }
 
@@ -160,11 +194,6 @@ public class AdminLogicTest {
         "email", Matchers.containsString(testUserDto.email.toLowerCase())
       );
 
-    RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .contentType("application/json")
-      .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
-    ;
   }
 
   @Test
@@ -189,7 +218,8 @@ public class AdminLogicTest {
       .statusCode(OK.getStatusCode())
     ;
 
-    testUserDto.setEmail("updated@trikorasolutions.com");
+    // Keycloak usa los emails como PKs, do not repeat the email
+    testUserDto.setEmail("updated2@trikorasolutions.com");
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
       .body(testUserDto)
@@ -216,17 +246,15 @@ public class AdminLogicTest {
       .then().statusCode(NOT_FOUND.getStatusCode())
     ;
 
-    RestAssured.given().auth().oauth2(getAccessToken("admin"))
-      .when()
-      .contentType("application/json")
-      .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
-    ;
   }
 
   @Test
   public void testUserRemoveOk() {
     UserDto testUserDto = new UserDto("testUserRemoveOk","testUserRemoveOk","testUserRemoveOk@trikorasolutions.com",
       true,"testUserRemoveOk");
+    RestAssured.given().auth().oauth2(getAccessToken("admin"))
+      .when().contentType("application/json")
+      .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName));
 
     RestAssured.given().auth().oauth2(getAccessToken("admin"))
       .when()
@@ -241,6 +269,9 @@ public class AdminLogicTest {
       .when()
       .contentType("application/json")
       .delete(String.format("/api/admin/trikorasolutions/users/%s", testUserDto.userName))
+      .then()
+      .statusCode(OK.getStatusCode())
+      .body(Matchers.containsString("true"))
     ;
   }
 
@@ -250,6 +281,8 @@ public class AdminLogicTest {
       .when()
       .contentType("application/json")
       .delete("/api/admin/trikorasolutions/users/unknown")
+      .then().statusCode(NOT_FOUND.getStatusCode())
+      .body(Matchers.containsString("false"))
     ;
   }
 

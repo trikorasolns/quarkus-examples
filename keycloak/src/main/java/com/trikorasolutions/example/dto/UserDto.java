@@ -1,12 +1,16 @@
 package com.trikorasolutions.example.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.trikorasolutions.keycloak.client.dto.KeycloakUserRepresentation;
 import io.quarkus.security.credential.Credential;
+
 import java.util.Collection;
 import java.util.Set;
 
 
 public class UserDto {
+  @JsonProperty("id")
+  public String id;
 
   @JsonProperty("userName")
   public String userName;
@@ -56,6 +60,11 @@ public class UserDto {
     this.email = email;
     this.enabled = enabled;
     this.userName = userName;
+  }
+
+  public UserDto(String id, String givenName, String familyName, String email, Boolean enabled, String userName) {
+    this(givenName, familyName, email, enabled, userName);
+    this.id = id;
   }
 
   public UserDto setUserName(String userName) {
@@ -113,8 +122,16 @@ public class UserDto {
     return this;
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
   @Override
   public String toString() {
-    return "UserDto{" + "userName='" + userName + '\'' + ", givenName='" + givenName + '\'' + ", familyName='" + familyName + '\'' + ", nickName='" + nickName + '\'' + ", preferredUsername='" + preferredUsername + '\'' + ", email='" + email + '\'' + ", emailVerified='" + emailVerified + '\'' + ", groups=" + groups + ", userPermissions=" + userPermissions + ", userCredentials=" + userCredentials + ", userRoles=" + userRoles + ", enabled=" + enabled + '}';
+    return "UserDto{" + "id='" + id + '\'' + ", userName='" + userName + '\'' + ", givenName='" + givenName + '\'' + ", familyName='" + familyName + '\'' + ", nickName='" + nickName + '\'' + ", preferredUsername='" + preferredUsername + '\'' + ", email='" + email + '\'' + ", emailVerified='" + emailVerified + '\'' + ", groups=" + groups + ", userPermissions=" + userPermissions + ", userCredentials=" + userCredentials + ", userRoles=" + userRoles + ", enabled=" + enabled + '}';
   }
 }

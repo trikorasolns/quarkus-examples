@@ -3,16 +3,20 @@ package com.trikorasolutions.example.bl;
 import com.trikorasolutions.example.dto.UserDto;
 import com.trikorasolutions.keycloak.client.clientresource.KeycloakAuthorizationResource;
 import com.trikorasolutions.keycloak.client.dto.UserRepresentation;
+import com.trikorasolutions.keycloak.client.dto.KeycloakUserRepresentation;
+import io.quarkus.security.credential.Credential;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.util.Set;
 
 @ApplicationScoped
 public class UserLogic {
@@ -38,9 +42,12 @@ public class UserLogic {
       from.enabled, from.userName);
   }
 
-  public static UserDto toUserDto(UserRepresentation from) {
+  public static UserDto toUserDto(KeycloakUserRepresentation from) {
     LOGGER.debug("#toUserDto(UserDto)... {}", from);
-    return new UserDto(from.firstName, from.lastName, from.email,
+
+    if (from == null) return new UserDto();
+
+    return new UserDto(from.id, from.firstName, from.lastName, from.email,
       from.enabled, from.username);
   }
 
