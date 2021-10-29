@@ -13,7 +13,7 @@ import java.util.Optional;
 public class KeycloakInfo {
   private static final Logger LOGGER = LoggerFactory.getLogger(KeycloakInfo.class);
   //  protected static final String KEYCLOAK_SERVER_URL = System.getProperty("keycloak.url", "https://localhost:8543/auth");
-  protected static final String KEYCLOAK_SERVER_URL = System.getProperty("keycloak.url", "http://localhost:8090/auth");
+  protected static final String KEYCLOAK_SERVER_URL = System.getProperty("keycloak.url", "http://localhost:7090/auth");
   protected static final String KEYCLOAK_REALM = "trikorasolutions";
   protected static final String KEYCLOAK_CLIENT_SECRET = "6e521ebe-e300-450f-811a-a08adc42ec4a";
   protected static final String KEYCLOAK_CLIENT_ID = "backend-service";
@@ -23,7 +23,8 @@ public class KeycloakInfo {
     LOGGER.warn("########### PRINTING CURRENT USER INFO ###########");
     LOGGER.warn("credentials: {}", keycloakSecurityContext.getCredentials());
     keycloakSecurityContext.getCredentials().forEach(c -> LOGGER.warn("credential: {}", c));
-    LOGGER.warn("credential[AccessTokenCredential]: {}", keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken());    LOGGER.warn("Attributes: {}", keycloakSecurityContext.getAttributes());
+    LOGGER.warn("credential[AccessTokenCredential]: {}", keycloakSecurityContext.getCredential(io.quarkus.oidc.AccessTokenCredential.class).getToken());
+    LOGGER.warn("Attributes: {}", keycloakSecurityContext.getAttributes());
     keycloakSecurityContext.getAttributes().forEach((k, v) -> LOGGER.warn("attribute {}: {}", k, v));
     ((OidcConfigurationMetadata)keycloakSecurityContext.getAttribute("configuration-metadata")).getPropertyNames().forEach(property -> LOGGER.warn("property: {}={}", property,((OidcConfigurationMetadata)keycloakSecurityContext.getAttribute("configuration-metadata")).get(property)));
     LOGGER.warn("permissions: {}", keycloakSecurityContext.getAttribute("permissions").toString());

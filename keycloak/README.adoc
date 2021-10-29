@@ -17,8 +17,8 @@ with yor firewall.
 
 [source,bash]
 ----
-firewall-cmd --add-port 8090/tcp --permanent
-firewall-cmd --add-port 8043/tcp --permanent
+firewall-cmd --add-port 7090/tcp --permanent
+firewall-cmd --add-port 7043/tcp --permanent
 ----
 
 === Create a podman for keyclock
@@ -28,7 +28,7 @@ In this case, you need to map the 8090 with the 8080 because Quarkus is currentl
 
 [source,bash]
 ----
-podman pod create -p 8090:8080 -p 8543:8443 --name trikora_keycloak_quarkus_example_pod
+podman pod create -p 7090:8080 -p 7543:8443 --name trikora_keycloak_quarkus_example_pod
 ----
 
 ==== Delete the previous pod
@@ -68,7 +68,6 @@ NOTE: the --rm flag is set for deleting the pod after the execution. You can kil
 flag instead of the --rm one. The -d option will launch the pod as a daemon.
 
 === Actions in the keycloak console
-
 * Link to keycloak console: https://localhost:8543/auth/admin/master/console/#/realms/trikorasolutions
 
 ==== Roles
