@@ -2,6 +2,7 @@ package com.trikorasolutions.example.resource;
 
 import com.trikorasolutions.example.bl.UserAdminLogic;
 import com.trikorasolutions.example.dto.UserDto;
+import com.trikorasolutions.keycloak.client.exception.*;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 
@@ -11,13 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
 
 @ApplicationScoped
@@ -67,9 +69,21 @@ public class AdminResource {
     return userAdminLogic.createUser(realm, keycloakSecurityContext, newUser).onItem().transform(userDto -> {
       LOGGER.debug("User created correctly: {}", userDto);
       return RestResponse.ResponseBuilder.ok(userDto).build();
-    }).onFailure().recoverWithItem(throwable -> {
-      LOGGER.debug("Error when creating user with exception:{}", throwable);
-      return RestResponse.ResponseBuilder.ok(new UserDto()).status(CONFLICT).build();
+    }).onFailure(DuplicatedUserException.class).recoverWithItem(throwable -> {
+      LOGGER.warn("DuplicatedUserException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.CONFLICT, new UserDto()).build();
+
+    }).onFailure(InvalidTokenException.class).recoverWithItem(throwable -> {
+      LOGGER.warn("InvalidTokenException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.UNAUTHORIZED, new UserDto()).build();
+
+    }).onFailure(ClientNotFoundException.class).recoverWithItem(throwable -> {
+      LOGGER.warn("ClientNotFoundException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
+
+    }).onFailure(ArgumentsFormatException.class).recoverWithItem(throwable -> {
+      LOGGER.warn("ArgumentsFormatException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.ok(new UserDto()).status(BAD_REQUEST).build();
     });
   }
 
@@ -82,10 +96,14 @@ public class AdminResource {
     }
     return userAdminLogic.updateUser(realm, keycloakSecurityContext, user.userName, user)
       .onItem().transform(userDto ->{
+        LOGGER.debug("#updateUser, username: {}", user.userName);
         return RestResponse.ResponseBuilder.ok(userDto).build();
-      }).onFailure().recoverWithItem(throwable ->{
-        LOGGER.debug("Error when updating user with exception:{}", throwable);
+      }).onFailure(NoSuchUserException.class).recoverWithItem(throwable -> {
+        LOGGER.warn("NoSuchUserException: {}", throwable.getMessage());
         return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
+      }).onFailure().recoverWithItem(throwable ->{
+        LOGGER.warn("Error when updating user with exception:{}", throwable);
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
       });
   }
 
@@ -99,8 +117,11 @@ public class AdminResource {
     return userAdminLogic.getUserInfo(realm, keycloakSecurityContext, user).onItem().transform(userDto -> {
       LOGGER.debug("User info fetched correctly: {}", userDto);
       return RestResponse.ResponseBuilder.ok(userDto).build();
+    }).onFailure(NoSuchUserException.class).recoverWithItem(throwable -> {
+      LOGGER.warn("NoSuchUserException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, new UserDto()).build();
     }).onFailure().recoverWithItem(throwable -> {
-      LOGGER.info("Error when fetching user info with exception:{}", throwable);
+      LOGGER.warn("Error when fetching user info with exception:{}", throwable);
       return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
     });
   }
@@ -108,33 +129,39 @@ public class AdminResource {
   @DELETE
   @Path("/{realm}/users/{user}")
   @NoCache
-  public Uni<RestResponse<Void>> deleteUser(@PathParam("realm") String realm, @PathParam("user") String user) {
+  public Uni<RestResponse<Boolean>> deleteUser(@PathParam("realm") String realm, @PathParam("user") String user) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.info("#deleteUser: {} with ID: {}", user);
     }
-    return userAdminLogic.deleteUser(realm, keycloakSecurityContext, user).onItem().transform(userDto ->{
-        LOGGER.debug("User deleted correctly: {}", userDto);
-        return RestResponse.ResponseBuilder.ok().build();
+    return userAdminLogic.deleteUser(realm, keycloakSecurityContext, user).onItem().transform(isDeleted ->{
+        LOGGER.debug("User deleted correctly: {}", isDeleted);
+        return RestResponse.ResponseBuilder.ok(isDeleted).build();
+      }).onFailure(NoSuchUserException.class).recoverWithItem(throwable -> {
+        LOGGER.debug("NoSuchUserException: {}", throwable.getMessage());
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, Boolean.FALSE).build();
       }).onFailure().recoverWithItem(throwable ->{
         // Do not print anything, deleting an unknown user is not consider an error
-        LOGGER.debug("Error when deleting user with exception:{}", throwable);
-        return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND).build();
+        LOGGER.warn("Error when deleting user with exception:{}", throwable);
+        return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, Boolean.FALSE).build();
     });
   }
 
   @GET
   @Path("/{realm}/groups/{group}")
   @NoCache
-  public Uni<RestResponse<JsonArray>> getGroupInfo(@PathParam("realm") String realm, @PathParam("group") String group) {
+  public Uni<RestResponse<JsonObject>> getGroupInfo(@PathParam("realm") String realm, @PathParam("group") String group) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("#getGroupInfo: {}", group);
     }
     return userAdminLogic.getGroupInfo(realm, keycloakSecurityContext, group).onItem().transform(groupArray -> {
       LOGGER.debug("Group info fetched correctly: {}", group);
       return RestResponse.ResponseBuilder.ok(groupArray).build();
+    }).onFailure(NoSuchGroupException.class).recoverWithItem(throwable -> {
+      LOGGER.info("NoSuchGroupException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, JsonObject.EMPTY_JSON_OBJECT).build();
     }).onFailure().recoverWithItem(throwable -> {
-      LOGGER.info("Error when fetching group info with exception:{}", throwable);
-      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonArray.EMPTY_JSON_ARRAY).build();
+      LOGGER.warn("Error when fetching group info with exception:{}", throwable);
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, JsonObject.EMPTY_JSON_OBJECT).build();
     });
   }
 
@@ -148,6 +175,9 @@ public class AdminResource {
     return userAdminLogic.getGroupUsers(realm, keycloakSecurityContext, group).onItem().transform(userDtoList -> {
       LOGGER.debug("Group users fetched correctly: {}", group);
       return RestResponse.ResponseBuilder.ok(userDtoList).build();
+    }).onFailure(NoSuchGroupException.class).recoverWithItem(throwable -> {
+      LOGGER.info("NoSuchGroupException: {}", throwable.getMessage());
+      return RestResponse.ResponseBuilder.create(RestResponse.Status.NOT_FOUND, (List<UserDto>) new ArrayList<UserDto>()).build();
     }).onFailure().recoverWithItem(throwable -> {
       LOGGER.info("Error when fetching group users with exception:{}", throwable);
       return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, (List<UserDto>) new ArrayList<UserDto>()).build();
@@ -187,5 +217,4 @@ public class AdminResource {
       return RestResponse.ResponseBuilder.create(RestResponse.Status.BAD_REQUEST, new UserDto()).build();
     });
   }
-
 }
